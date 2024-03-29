@@ -11,6 +11,6 @@ config_version=5
 [application]
 
 config/name="Living Pixels"
-run/main_scene="res://tests/compute_test/compute_test.tscn"
+run/main_scene="res://scenes/simulation.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
