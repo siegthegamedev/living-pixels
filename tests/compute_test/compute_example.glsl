@@ -20,7 +20,3 @@ layout(set = 0, binding = 0, std430) restrict buffer MyDataBuffer {
 void main() {
     my_data_buffer.data[gl_GlobalInvocationID.x] *= multiply;
 }
-
-
-
-
