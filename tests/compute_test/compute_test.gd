@@ -6,7 +6,7 @@ func _ready():
 	var rendering_device := RenderingServer.create_local_rendering_device()
 	
 	# Load shader
-	var shader_file: RDShaderFile = load("res://compute_example.glsl")
+	var shader_file: RDShaderFile = load("res://tests/compute_test/compute_example.glsl")
 	var shader_spirv: RDShaderSPIRV = shader_file.get_spirv()
 	var shader := rendering_device.shader_create_from_spirv(shader_spirv)
 
