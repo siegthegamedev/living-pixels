@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://bg5g2ek2sfbo7"]
+
+[ext_resource type="Script" path="res://tests/encode_decode_test/encode_decode_test.gd" id="1_c0vi8"]
+[ext_resource type="Resource" uid="uid://c2em5s6g8ox3r" path="res://tests/encode_decode_test/test_element.tres" id="2_mi4h2"]
+
+[node name="EncodeDecodeTest" type="Node"]
+script = ExtResource("1_c0vi8")
+element = ExtResource("2_mi4h2")
