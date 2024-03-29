@@ -33,6 +33,13 @@ static func encode(object: Object) -> PackedByteArray:
 	return packed_array
 
 
+static func encode_array(objects: Array) -> PackedByteArray:
+	var packed_array := PackedByteArray()
+	for object in objects:
+		packed_array.append_array(encode(object))
+	return packed_array
+
+
 static func decode(packed_array: PackedByteArray, type: Object) -> Object:
 	var decoded_object: Object = type.new()
 	var byte_offset: int = 0
@@ -52,9 +59,9 @@ static func decode(packed_array: PackedByteArray, type: Object) -> Object:
 	return decoded_object
 
 
-static func decode_array(packed_array: PackedByteArray, type: Object, count: int) -> Array[Object]:
+static func decode_array(packed_array: PackedByteArray, type: Object, count: int) -> Array:
 	var type_size = sizeof(type)
-	var decoded_objects: Array[Object] = []
+	var decoded_objects := []
 	for i in count:
 		var slice_begin: int = i * type_size
 		var slice_end: int = slice_begin + type_size

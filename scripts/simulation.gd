@@ -14,9 +14,7 @@ func _ready():
 	var shader := rendering_device.shader_create_from_spirv(shader_spirv)
 
 	# Prepare input buffer
-	var input := PackedByteArray()
-	for element: Element in elements:
-		input.append_array(Packing.encode(element))
+	var input := Packing.encode_array(elements)
 	var buffer := rendering_device.storage_buffer_create(input.size(), input)
 	
 	# Bind the input buffer to the compute shader

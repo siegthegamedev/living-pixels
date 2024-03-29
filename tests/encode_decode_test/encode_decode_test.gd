@@ -4,9 +4,7 @@ extends Node
 
 
 func _ready() -> void:
-	var byte_array := PackedByteArray()
-	for element in elements:
-		byte_array.append_array(Packing.encode(element))
+	var byte_array := Packing.encode_array(elements)
 	var decoded_elements: Array[Element] = []
 	decoded_elements.assign(Packing.decode_array(byte_array, Element, elements.size()))
 	
