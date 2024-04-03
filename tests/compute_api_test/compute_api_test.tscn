@@ -1,0 +1,9 @@
+[gd_scene load_steps=4 format=3 uid="uid://vu6gkf52hc4u"]
+
+[ext_resource type="Script" path="res://tests/compute_api_test/compute_api_test.gd" id="1_olyha"]
+[ext_resource type="Resource" uid="uid://cqt7jwpw1syfk" path="res://resources/elements/empty.tres" id="2_vtcg4"]
+[ext_resource type="Resource" uid="uid://bmh7gxhl1puyq" path="res://resources/elements/sand.tres" id="3_sysnv"]
+
+[node name="ComputeApiTest" type="Node"]
+script = ExtResource("1_olyha")
+elements = Array[Resource("res://scripts/element.gd")]([ExtResource("2_vtcg4"), ExtResource("3_sysnv"), ExtResource("2_vtcg4"), ExtResource("3_sysnv")])
