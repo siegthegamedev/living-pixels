@@ -1,6 +1,9 @@
 class_name Packing
 extends Object
 
+const SIZEOF_INT: int = 4
+const SIZEOF_FLOAT: int = 4
+
 
 static func sizeof_object(type: Object) -> int:
 	var size: int = 0
@@ -11,9 +14,9 @@ static func sizeof_object(type: Object) -> int:
 		if not (property_usage & PROPERTY_USAGE_EDITOR): continue
 		match property_type:
 			TYPE_FLOAT:
-				size += 4
+				size += SIZEOF_FLOAT
 			TYPE_INT:
-				size += 4
+				size += SIZEOF_INT
 	return size
 
 
@@ -52,10 +55,10 @@ static func decode_object(packed_array: PackedByteArray, type: Object) -> Object
 		match property_type:
 			TYPE_FLOAT:
 				decoded_object[property_name] = decode_float(packed_array, byte_offset)
-				byte_offset += 4
+				byte_offset += SIZEOF_FLOAT
 			TYPE_INT:
 				decoded_object[property_name] = decode_int(packed_array, byte_offset)
-				byte_offset += 4
+				byte_offset += SIZEOF_FLOAT
 	return decoded_object
 
 
