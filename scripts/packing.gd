@@ -2,7 +2,7 @@ class_name Packing
 extends Object
 
 
-static func sizeof(type: Object) -> int:
+static func sizeof_object(type: Object) -> int:
 	var size: int = 0
 	for property in type.new().get_property_list():
 		var property_type: int = property["type"]
@@ -17,7 +17,7 @@ static func sizeof(type: Object) -> int:
 	return size
 
 
-static func encode(object: Object) -> PackedByteArray:
+static func encode_object(object: Object) -> PackedByteArray:
 	var packed_array := PackedByteArray()
 	for property in object.get_property_list():
 		var property_name: String = property["name"]
@@ -33,14 +33,14 @@ static func encode(object: Object) -> PackedByteArray:
 	return packed_array
 
 
-static func encode_array(objects: Array) -> PackedByteArray:
+static func encode_objects(objects: Array) -> PackedByteArray:
 	var packed_array := PackedByteArray()
 	for object in objects:
-		packed_array.append_array(encode(object))
+		packed_array.append_array(encode_object(object))
 	return packed_array
 
 
-static func decode(packed_array: PackedByteArray, type: Object) -> Object:
+static func decode_object(packed_array: PackedByteArray, type: Object) -> Object:
 	var decoded_object: Object = type.new()
 	var byte_offset: int = 0
 	for property in decoded_object.get_property_list():
@@ -59,13 +59,13 @@ static func decode(packed_array: PackedByteArray, type: Object) -> Object:
 	return decoded_object
 
 
-static func decode_array(packed_array: PackedByteArray, type: Object, count: int) -> Array:
-	var type_size = sizeof(type)
+static func decode_objects(packed_array: PackedByteArray, type: Object, count: int) -> Array:
+	var type_size = sizeof_object(type)
 	var decoded_objects := []
 	for i in count:
 		var slice_begin: int = i * type_size
 		var slice_end: int = slice_begin + type_size
-		decoded_objects.append(decode(packed_array.slice(slice_begin, slice_end), type))
+		decoded_objects.append(decode_object(packed_array.slice(slice_begin, slice_end), type))
 	return decoded_objects
 
 

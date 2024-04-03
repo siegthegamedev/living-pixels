@@ -14,7 +14,7 @@ func _ready():
 	var shader := rendering_device.shader_create_from_spirv(shader_spirv)
 
 	# Prepare input buffer
-	var input := Packing.encode_array(elements)
+	var input := Packing.encode_objects(elements)
 	var buffer := rendering_device.storage_buffer_create(input.size(), input)
 	
 	# Bind the input buffer to the compute shader
@@ -40,10 +40,10 @@ func _ready():
 	var output_bytes := rendering_device.buffer_get_data(buffer)
 	print("input size: " + str(input.size()))
 	print("output size: " + str(output_bytes.size()))
-	print("element size: " + str(Packing.sizeof(Element)))
+	print("element size: " + str(Packing.sizeof_object(Element)))
 	print()
 	var output: Array[Element] = []
-	output.assign(Packing.decode_array(output_bytes, Element, elements.size()))
+	output.assign(Packing.decode_objects(output_bytes, Element, elements.size()))
 	
 	print(input)
 	print(output_bytes)

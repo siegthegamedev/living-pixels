@@ -15,12 +15,12 @@ func _init(compute_shader: ComputeShader, binding_index: int) -> void:
 	
 	rendering_device = compute_shader.rendering_device
 	uniform = RDUniform.new()
-	uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	uniform.uniform_type =  RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
 	uniform.binding = binding_index
 
 
 func set_data(data: Array) -> void:
-	data_bytes = Packing.encode_array(data)
+	data_bytes = Packing.encode_objects(data)
 	buffer = rendering_device.storage_buffer_create(data_bytes.size(), data_bytes)
 	uniform.clear_ids()
 	uniform.add_id(buffer)
@@ -29,7 +29,7 @@ func set_data(data: Array) -> void:
 
 func get_data(type: Object, count: int) -> Array:
 	var output_bytes := rendering_device.buffer_get_data(buffer)
-	return Packing.decode_array(output_bytes, type, count)
+	return Packing.decode_objects(output_bytes, type, count)
 
 
 func _on_shader_dispatch() -> void:
