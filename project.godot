@@ -14,3 +14,7 @@ config/name="Living Pixels"
 run/main_scene="res://scenes/simulation.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
+
+[filesystem]
+
+import/blender/enabled=false
