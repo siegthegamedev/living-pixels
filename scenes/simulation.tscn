@@ -1,9 +1,13 @@
 [gd_scene load_steps=4 format=3 uid="uid://bve6cl40135j1"]
 
 [ext_resource type="Script" path="res://scripts/simulation.gd" id="1_c87s1"]
-[ext_resource type="Resource" uid="uid://bmh7gxhl1puyq" path="res://resources/elements/sand.tres" id="2_4krqj"]
-[ext_resource type="Resource" uid="uid://cqt7jwpw1syfk" path="res://resources/elements/empty.tres" id="2_5ob0s"]
+[ext_resource type="Script" path="res://scripts/simulation_params.gd" id="2_cqhuj"]
+
+[sub_resource type="Resource" id="Resource_577jf"]
+script = ExtResource("2_cqhuj")
+widht = 8
+height = 8
 
 [node name="Simulation" type="Node"]
 script = ExtResource("1_c87s1")
-elements = Array[Resource("res://scripts/element.gd")]([ExtResource("2_4krqj"), ExtResource("2_5ob0s"), ExtResource("2_5ob0s"), ExtResource("2_4krqj")])
+params = SubResource("Resource_577jf")
