@@ -41,3 +41,5 @@ func _ready():
 		print(element.id)
 		print()
 		i += 1
+	
+	compute_shader.dispose([params_buffer, grid_buffer, output_grid_buffer])

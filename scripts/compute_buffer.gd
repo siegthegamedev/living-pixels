@@ -37,6 +37,10 @@ func get_data() -> Array:
 	return Packing.decode_objects(output_bytes, _buffer_type, _buffer_size)
 
 
+func dispose() -> void:
+	rendering_device.free_rid(buffer)
+
+
 func _on_shader_dispatch() -> void:
 	if not _data_set:
 		printerr("Attempting to dispatch ComputeShader without setting data on the ComputeBuffer. "

@@ -14,6 +14,7 @@ var uniform_sets: Dictionary
 var first_dispatch: bool = true
 
 var _pipeline_setup: bool = false
+var _uniform_sets: Array[RID] = []
 
 
 static func from_file(path: String) -> ComputeShader:
@@ -37,12 +38,18 @@ func create_compute_buffer(set_index: int, binding_index: int) -> ComputeBuffer:
 
 
 func setup_pipeline(x_groups: int, y_groups: int, z_groups: int) -> void:
+	if _pipeline_setup:
+		rendering_device.free_rid(pipeline)
+		_free_uniform_sets()
+		uniform_sets.clear()
+	
 	pipeline = rendering_device.compute_pipeline_create(shader)
 	compute_list = rendering_device.compute_list_begin()
 	rendering_device.compute_list_bind_compute_pipeline(compute_list, pipeline)
 	for set_index in uniform_sets:
 		var uniform_set := rendering_device.uniform_set_create(uniform_sets[set_index], shader, set_index)
 		rendering_device.compute_list_bind_uniform_set(compute_list, uniform_set, set_index)
+		_uniform_sets.append(uniform_set)
 	rendering_device.compute_list_dispatch(compute_list, x_groups, y_groups, z_groups)
 	rendering_device.compute_list_end()
 	_pipeline_setup = true
@@ -62,8 +69,22 @@ func sync() -> void:
 	synced.emit()
 
 
+func dispose(buffers_to_dispose: Array[ComputeBuffer]) -> void:
+	_free_uniform_sets()
+	for buffer: ComputeBuffer in buffers_to_dispose:
+		buffer.dispose()
+	rendering_device.free_rid(pipeline)
+	rendering_device.free_rid(shader)
+	rendering_device.free()
+
+
 func _add_uniform_to_set(uniform: RDUniform, set_index: int) -> void:
 	if uniform_sets.has(set_index):
 		uniform_sets[set_index].append(uniform)
 	else:
 		uniform_sets[set_index] = [uniform]
+
+
+func _free_uniform_sets() -> void:
+	for uniform_set in _uniform_sets:
+		rendering_device.free_rid(uniform_set)
