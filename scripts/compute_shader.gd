@@ -30,14 +30,13 @@ static func from_file(path: String) -> ComputeShader:
 	return cs
 
 
-func create_compute_buffer(binding_index: int, set_index: int) -> ComputeBuffer:
+func create_compute_buffer(set_index: int, binding_index: int) -> ComputeBuffer:
 	var cb := ComputeBuffer.new(self, binding_index)
 	_add_uniform_to_set(cb.uniform, set_index)
 	return cb
 
 
 func setup_pipeline(x_groups: int, y_groups: int, z_groups: int) -> void:
-	# Define the compute pipeline
 	pipeline = rendering_device.compute_pipeline_create(shader)
 	compute_list = rendering_device.compute_list_begin()
 	rendering_device.compute_list_bind_compute_pipeline(compute_list, pipeline)

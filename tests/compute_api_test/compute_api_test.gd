@@ -6,15 +6,15 @@ extends Node
 func _ready() -> void:
 	var compute_shader := ComputeShader.from_file("res://tests/compute_api_test/compute_api_test.glsl")
 	
-	var compute_buffer := compute_shader.create_compute_buffer(0, 0)
-	compute_buffer.set_data(elements)
+	var elements_buffer := compute_shader.create_compute_buffer(0, 0)
+	elements_buffer.set_data(elements)
 	
 	compute_shader.setup_pipeline(1, 1, 1)
 	compute_shader.dispatch()
 	compute_shader.sync()
 	
 	var output_data: Array[Element] = []
-	output_data.assign(compute_buffer.get_data(Element, elements.size()))
+	output_data.assign(elements_buffer.get_data())
 	
 	for element in output_data:
 		print("Element")

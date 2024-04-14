@@ -7,6 +7,8 @@ var buffer: RID
 var uniform: RDUniform
 
 var _data_set: bool = false
+var _buffer_size: int = -1
+var _buffer_type: GDScript = null
 
 
 func _init(compute_shader: ComputeShader, binding_index: int) -> void:
@@ -19,7 +21,10 @@ func _init(compute_shader: ComputeShader, binding_index: int) -> void:
 	uniform.binding = binding_index
 
 
-func set_data(data: Array) -> void:
+func set_data(data: Variant) -> void:
+	data = data if data is Array else [data]
+	_buffer_size = data.size()
+	_buffer_type = data[0].get_script()
 	data_bytes = Packing.encode_objects(data)
 	buffer = rendering_device.storage_buffer_create(data_bytes.size(), data_bytes)
 	uniform.clear_ids()
@@ -27,9 +32,9 @@ func set_data(data: Array) -> void:
 	_data_set = true
 
 
-func get_data(type: Object, count: int) -> Array:
+func get_data() -> Array:
 	var output_bytes := rendering_device.buffer_get_data(buffer)
-	return Packing.decode_objects(output_bytes, type, count)
+	return Packing.decode_objects(output_bytes, _buffer_type, _buffer_size)
 
 
 func _on_shader_dispatch() -> void:

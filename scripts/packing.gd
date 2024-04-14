@@ -5,9 +5,9 @@ const SIZEOF_INT: int = 4
 const SIZEOF_FLOAT: int = 4
 
 
-static func sizeof_object(type: Object) -> int:
+static func sizeof_object(type: GDScript) -> int:
 	var size: int = 0
-	for property in type.new().get_property_list():
+	for property in type.get_script_property_list():
 		var property_type: int = property["type"]
 		var property_usage: int = property["usage"]
 		if not (property_usage & PROPERTY_USAGE_SCRIPT_VARIABLE): continue
@@ -22,7 +22,7 @@ static func sizeof_object(type: Object) -> int:
 
 static func encode_object(object: Object) -> PackedByteArray:
 	var packed_array := PackedByteArray()
-	for property in object.get_property_list():
+	for property in object.get_script().get_script_property_list():
 		var property_name: String = property["name"]
 		var property_type: int = property["type"]
 		var property_usage: int = property["usage"]
@@ -43,10 +43,10 @@ static func encode_objects(objects: Array) -> PackedByteArray:
 	return packed_array
 
 
-static func decode_object(packed_array: PackedByteArray, type: Object) -> Object:
+static func decode_object(packed_array: PackedByteArray, type: GDScript) -> Object:
 	var decoded_object: Object = type.new()
 	var byte_offset: int = 0
-	for property in decoded_object.get_property_list():
+	for property in type.get_script_property_list():
 		var property_name: String = property["name"]
 		var property_type: int = property["type"]
 		var property_usage: int = property["usage"]
