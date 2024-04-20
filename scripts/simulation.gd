@@ -2,9 +2,10 @@ class_name Simulation
 extends Node
 
 const EMPTY_ELEMENT: Element = preload("res://resources/elements/empty.tres")
-const SAND_ELEMENT: Element = preload("res://resources/elements/sand.tres")
+const SAND_ELEMENT:  Element = preload("res://resources/elements/sand.tres")
 const WATER_ELEMENT: Element = preload("res://resources/elements/water.tres")
-const WOOD_ELEMENT: Element = preload("res://resources/elements/wood.tres")
+const WOOD_ELEMENT:  Element = preload("res://resources/elements/wood.tres")
+const GAS_ELEMENT:   Element = preload("res://resources/elements/gas.tres")
 
 @export var simulation_visualizer: Sprite2D
 @export var params: SimulationParams
@@ -30,6 +31,8 @@ func _ready():
 
 
 func _process(_delta: float) -> void:
+	get_window().title = "Living Pixels (FPS: " + str(Engine.get_frames_per_second()) + ")"
+	
 	# Add brush
 	if Input.is_action_pressed("add_element"): add_element()
 	
@@ -55,6 +58,7 @@ func _input(event: InputEvent) -> void:
 			KEY_1: selected_element = SAND_ELEMENT
 			KEY_2: selected_element = WATER_ELEMENT
 			KEY_3: selected_element = WOOD_ELEMENT
+			KEY_4: selected_element = GAS_ELEMENT
 
 
 func setup_simulation() -> void:
@@ -123,4 +127,5 @@ func get_element_color(element: Element) -> Color:
 		SAND_ELEMENT.id:  return Color.BLANCHED_ALMOND
 		WATER_ELEMENT.id: return Color.DARK_BLUE
 		WOOD_ELEMENT.id:  return Color.SADDLE_BROWN
+		GAS_ELEMENT.id:   return Color.MISTY_ROSE
 	return Color(0.0, 0.0, 0.0, 0.0)
