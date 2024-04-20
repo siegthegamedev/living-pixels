@@ -19,6 +19,7 @@ var output_elements_compute_buffer: ComputeBuffer
 
 var simulation_image: Image
 var paused: bool = false
+var selected_element: Element = SAND_ELEMENT
 
 
 func _ready():
@@ -46,6 +47,14 @@ func _process(_delta: float) -> void:
 		cleanup_compute_shader()
 		await self.get_tree().create_timer(0.1).timeout
 		self.get_tree().quit()
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.is_pressed():
+		match event.keycode:
+			KEY_1: selected_element = SAND_ELEMENT
+			KEY_2: selected_element = WATER_ELEMENT
+			KEY_3: selected_element = WOOD_ELEMENT
 
 
 func setup_simulation() -> void:
@@ -97,7 +106,7 @@ func add_element() -> void:
 		for j in [-1, 0, 1]:
 			if add_position.y + j < 0 or add_position.y + j >= params.height: continue
 			var add_id = (add_position.y + j) * params.width + (add_position.x + i)
-			input_elements[add_id] = WOOD_ELEMENT;
+			input_elements[add_id] = selected_element;
 
 
 func update_visualization() -> void:
