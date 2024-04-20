@@ -5,9 +5,18 @@
 
 [sub_resource type="Resource" id="Resource_577jf"]
 script = ExtResource("2_cqhuj")
-widht = 8
-height = 8
+width = 32
+height = 32
+vertical_rand = 0.0
+horizontal_rand = 0.0
 
-[node name="Simulation" type="Node"]
+[node name="Simulation" type="Node" node_paths=PackedStringArray("simulation_visualizer")]
 script = ExtResource("1_c87s1")
+simulation_visualizer = NodePath("SimulationVisualizer")
 params = SubResource("Resource_577jf")
+
+[node name="SimulationVisualizer" type="Sprite2D" parent="."]
+texture_filter = 1
+texture_repeat = 1
+scale = Vector2(25, 25)
+centered = false

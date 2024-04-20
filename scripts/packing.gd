@@ -3,6 +3,7 @@ extends Object
 
 const SIZEOF_INT: int = 4
 const SIZEOF_FLOAT: int = 4
+const SIZEOF_BOOL: int = 4
 
 
 static func sizeof_object(type: GDScript) -> int:
@@ -17,6 +18,8 @@ static func sizeof_object(type: GDScript) -> int:
 				size += SIZEOF_FLOAT
 			TYPE_INT:
 				size += SIZEOF_INT
+			TYPE_BOOL:
+				size += SIZEOF_BOOL
 	return size
 
 
@@ -33,6 +36,8 @@ static func encode_object(object: Object) -> PackedByteArray:
 				encode_float(packed_array, object[property_name])
 			TYPE_INT:
 				encode_int(packed_array, object[property_name])
+			TYPE_BOOL:
+				encode_bool(packed_array, object[property_name])
 	return packed_array
 
 
@@ -59,6 +64,9 @@ static func decode_object(packed_array: PackedByteArray, type: GDScript) -> Obje
 			TYPE_INT:
 				decoded_object[property_name] = decode_int(packed_array, byte_offset)
 				byte_offset += SIZEOF_FLOAT
+			TYPE_BOOL:
+				decoded_object[property_name] = decode_bool(packed_array, byte_offset)
+				byte_offset += SIZEOF_BOOL
 	return decoded_object
 
 
@@ -72,24 +80,24 @@ static func decode_objects(packed_array: PackedByteArray, type: Object, count: i
 	return decoded_objects
 
 
+static func encode_bool(packed_array: PackedByteArray, value: bool) -> void:
+	packed_array.append_array(PackedInt32Array([1 if value else 0]).to_byte_array())
+
+
 static func encode_int(packed_array: PackedByteArray, value: int) -> void:
 	packed_array.append_array(PackedInt32Array([value]).to_byte_array())
-
-
-static func encode_ints(packed_array: PackedByteArray, values: Array[int]) -> void:
-	packed_array.append_array(PackedInt32Array(values).to_byte_array())
-
-
-static func decode_int(packed_array: PackedByteArray, byte_offset: int) -> int:
-	return packed_array.decode_s32(byte_offset)
 
 
 static func encode_float(packed_array: PackedByteArray, value: float) -> void:
 	packed_array.append_array(PackedFloat32Array([value]).to_byte_array())
 
 
-static func encode_floats(packed_array: PackedByteArray, values: Array[float]) -> void:
-	packed_array.append_array(PackedFloat32Array(values).to_byte_array())
+static func decode_bool(packed_array: PackedByteArray, byte_offset: int) -> bool:
+	return packed_array.decode_u32(byte_offset) == 1
+
+
+static func decode_int(packed_array: PackedByteArray, byte_offset: int) -> int:
+	return packed_array.decode_s32(byte_offset)
 
 
 static func decode_float(packed_array: PackedByteArray, byte_offset: int) -> float:

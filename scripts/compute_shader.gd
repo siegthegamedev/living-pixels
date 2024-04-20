@@ -40,8 +40,6 @@ func create_compute_buffer(set_index: int, binding_index: int) -> ComputeBuffer:
 func setup_pipeline(x_groups: int, y_groups: int, z_groups: int) -> void:
 	if _pipeline_setup:
 		rendering_device.free_rid(pipeline)
-		_free_uniform_sets()
-		uniform_sets.clear()
 	
 	pipeline = rendering_device.compute_pipeline_create(shader)
 	compute_list = rendering_device.compute_list_begin()
@@ -87,4 +85,6 @@ func _add_uniform_to_set(uniform: RDUniform, set_index: int) -> void:
 
 func _free_uniform_sets() -> void:
 	for uniform_set in _uniform_sets:
+		if not rendering_device.uniform_set_is_valid(uniform_set): continue
 		rendering_device.free_rid(uniform_set)
+	uniform_sets.clear()

@@ -22,6 +22,9 @@ func _init(compute_shader: ComputeShader, binding_index: int) -> void:
 
 
 func set_data(data: Variant) -> void:
+	if _data_set:
+		rendering_device.free_rid(buffer)
+	
 	data = data if data is Array else [data]
 	_buffer_size = data.size()
 	_buffer_type = data[0].get_script()
