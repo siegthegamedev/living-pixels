@@ -22,14 +22,18 @@ func _init(compute_shader: ComputeShader, binding_index: int) -> void:
 
 
 func set_data(data: Variant) -> void:
-	if _data_set:
-		rendering_device.free_rid(buffer)
-	
 	data = data if data is Array else [data]
 	_buffer_size = data.size()
 	_buffer_type = data[0].get_script()
 	data_bytes = Packing.encode_objects(data)
-	buffer = rendering_device.storage_buffer_create(data_bytes.size(), data_bytes)
+	set_bytes(data_bytes)
+
+
+func set_bytes(data: PackedByteArray) -> void:
+	if _data_set:
+		rendering_device.free_rid(buffer)
+	
+	buffer = rendering_device.storage_buffer_create(data.size(), data)
 	uniform.clear_ids()
 	uniform.add_id(buffer)
 	_data_set = true
@@ -38,6 +42,10 @@ func set_data(data: Variant) -> void:
 func get_data() -> Array:
 	var output_bytes := rendering_device.buffer_get_data(buffer)
 	return Packing.decode_objects(output_bytes, _buffer_type, _buffer_size)
+
+
+func get_bytes() -> PackedByteArray:
+	return rendering_device.buffer_get_data(buffer)
 
 
 func dispose() -> void:

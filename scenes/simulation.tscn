@@ -5,8 +5,8 @@
 
 [sub_resource type="Resource" id="Resource_577jf"]
 script = ExtResource("2_cqhuj")
-width = 32
-height = 32
+width = 64
+height = 64
 vertical_rand = 0.0
 horizontal_rand = 0.0
 
@@ -18,5 +18,5 @@ params = SubResource("Resource_577jf")
 [node name="SimulationVisualizer" type="Sprite2D" parent="."]
 texture_filter = 1
 texture_repeat = 1
-scale = Vector2(25, 25)
+scale = Vector2(12.5, 12.5)
 centered = false

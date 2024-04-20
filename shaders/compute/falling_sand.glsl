@@ -49,6 +49,7 @@ bool is_cell_empty(uint x, uint y);
 void set_output_cell(Element element, uint x, uint y);
 void parse_update_output(Element element, UpdateOutput update_output);
 void sync_buffers(uint x, uint y);
+void clear_output_buffer(uint x, uint y);
 void sync_threads(uint x, uint y);
 
 // Update Functions
@@ -98,16 +99,15 @@ void parse_update_output(Element element, UpdateOutput update_output) {
 void sync_buffers(uint x, uint y) {
     uint index = get_index_from_position(x, y);
     elements.data[index] = output_elements.data[index];
+}
+
+void clear_output_buffer(uint x, uint y) {
+    uint index = get_index_from_position(x, y);
     output_elements.data[index].id = 0;
 }
 
-void sync_threads(uint x, uint y) {
-    memoryBarrierShared();
-    barrier();
-
-    sync_buffers(x, y);
-
-    memoryBarrierShared();
+void sync_threads() {
+    memoryBarrier();
     barrier();
 }
 
@@ -250,10 +250,24 @@ void main() {
     if (gl_GlobalInvocationID.x >= elements.data.length()) return;
     uint x = gl_GlobalInvocationID.x % params.width;
     uint y = gl_GlobalInvocationID.x / params.width;
-
+    
     update_vertical(elements.data[gl_GlobalInvocationID.x], x, y);
-    sync_threads(x, y);
+    
+    sync_threads();
+    sync_buffers(x, y);
+    clear_output_buffer(x, y);
+    sync_threads();
+
     update_diagonal(elements.data[gl_GlobalInvocationID.x], x, y);
-    sync_threads(x, y);
+    
+    sync_threads();
+    sync_buffers(x, y);
+    clear_output_buffer(x, y);
+    sync_threads();
+    
     update_horizontal(elements.data[gl_GlobalInvocationID.x], x, y);
+    
+    sync_threads();
+    sync_buffers(x, y);
+    clear_output_buffer(x, y);
 }

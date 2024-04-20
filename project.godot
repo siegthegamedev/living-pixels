@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 window/size/viewport_width=800
 window/size/viewport_height=800
+window/size/always_on_top=true
 window/vsync/vsync_mode=0
 
 [filesystem]

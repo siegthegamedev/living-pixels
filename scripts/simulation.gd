@@ -41,7 +41,6 @@ func _process(_delta: float) -> void:
 	
 	if not paused or Input.is_action_just_pressed("simulation_step"):
 		dispatch_compute_shader()
-		get_compute_data()
 		update_visualization()
 	
 	# Cleanup the simulation
@@ -77,27 +76,29 @@ func setup_compute_shader() -> void:
 	params_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 0)
 	input_elements_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 1)
 	output_elements_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 2)
+	
+	params_compute_buffer.set_data(params)
+	input_elements_compute_buffer.set_data(input_elements)
+	output_elements_compute_buffer.set_data(output_elements)
 
 
 func dispatch_compute_shader() -> void:
 	params.vertical_rand = randf()
 	params.horizontal_rand = randf()
 	
-	params_compute_buffer.set_data(params)
-	input_elements_compute_buffer.set_data(input_elements)
-	output_elements_compute_buffer.set_data(output_elements)
-	falling_sand_compute_shader.setup_pipeline(1, 1, 1)
+	params_compute_buffer.set_bytes(params.encode())
+	falling_sand_compute_shader.setup_pipeline(4, 1, 1)
 	falling_sand_compute_shader.dispatch()
 	falling_sand_compute_shader.sync()
 
 
-func get_compute_data() -> void:
-	input_elements.assign(output_elements_compute_buffer.get_data())
+func get_compute_data() -> Array[Element]:
+	return Element.decode_elements(input_elements_compute_buffer.get_bytes(), input_elements.size())
 
 
 func cleanup_compute_shader() -> void:
 	falling_sand_compute_shader.dispose([
-		params_compute_buffer, 
+		params_compute_buffer,
 		input_elements_compute_buffer, 
 		output_elements_compute_buffer
 	])
@@ -111,14 +112,18 @@ func add_element() -> void:
 			if add_position.y + j < 0 or add_position.y + j >= params.height: continue
 			var add_id = (add_position.y + j) * params.width + (add_position.x + i)
 			input_elements[add_id] = selected_element;
+	input_elements_compute_buffer.set_bytes(Element.encode_elements(input_elements))
 
 
 func update_visualization() -> void:
+	var elements := get_compute_data()
+	input_elements.assign(elements)
 	for x in params.width:
 		for y in params.height:
-			simulation_image.set_pixel(x, y, get_element_color(input_elements[y * params.width + x]))
+			simulation_image.set_pixel(x, y, get_element_color(elements[y * params.width + x]))
 	
 	simulation_visualizer.texture = ImageTexture.create_from_image(simulation_image)
+	simulation_visualizer.scale = Vector2(get_window().size) / Vector2(params.width, params.height)
 
 
 func get_element_color(element: Element) -> Color:
