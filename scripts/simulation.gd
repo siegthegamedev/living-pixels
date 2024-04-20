@@ -4,6 +4,7 @@ extends Node
 const EMPTY_ELEMENT: Element = preload("res://resources/elements/empty.tres")
 const SAND_ELEMENT: Element = preload("res://resources/elements/sand.tres")
 const WATER_ELEMENT: Element = preload("res://resources/elements/water.tres")
+const WOOD_ELEMENT: Element = preload("res://resources/elements/wood.tres")
 
 @export var simulation_visualizer: Sprite2D
 @export var params: SimulationParams
@@ -81,6 +82,14 @@ func get_compute_data() -> void:
 	input_elements.assign(output_elements_compute_buffer.get_data())
 
 
+func cleanup_compute_shader() -> void:
+	falling_sand_compute_shader.dispose([
+		params_compute_buffer, 
+		input_elements_compute_buffer, 
+		output_elements_compute_buffer
+	])
+
+
 func add_element() -> void:
 	var add_position: Vector2i = get_viewport().get_mouse_position() / simulation_visualizer.scale
 	for i in [-1, 0, 1]:
@@ -88,7 +97,7 @@ func add_element() -> void:
 		for j in [-1, 0, 1]:
 			if add_position.y + j < 0 or add_position.y + j >= params.height: continue
 			var add_id = (add_position.y + j) * params.width + (add_position.x + i)
-			input_elements[add_id] = WATER_ELEMENT;
+			input_elements[add_id] = WOOD_ELEMENT;
 
 
 func update_visualization() -> void:
@@ -101,15 +110,8 @@ func update_visualization() -> void:
 
 func get_element_color(element: Element) -> Color:
 	match element.id:
-		0: return Color(0.0, 0.0, 0.0, 0.0)
-		1: return Color(0.8, 0.64, 0.04, 1.0)
-		2: return Color(0.0, 0.0, 1.0)
+		EMPTY_ELEMENT.id: return Color.TRANSPARENT
+		SAND_ELEMENT.id:  return Color.BLANCHED_ALMOND
+		WATER_ELEMENT.id: return Color.DARK_BLUE
+		WOOD_ELEMENT.id:  return Color.SADDLE_BROWN
 	return Color(0.0, 0.0, 0.0, 0.0)
-
-
-func cleanup_compute_shader() -> void:
-	falling_sand_compute_shader.dispose([
-		params_compute_buffer, 
-		input_elements_compute_buffer, 
-		output_elements_compute_buffer
-	])
