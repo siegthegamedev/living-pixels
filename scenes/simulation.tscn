@@ -7,6 +7,8 @@
 script = ExtResource("2_cqhuj")
 width = 64
 height = 64
+brush_position = Vector2i(0, 0)
+mouse_pressed = false
 vertical_rand = 0.0
 horizontal_rand = 0.0
 

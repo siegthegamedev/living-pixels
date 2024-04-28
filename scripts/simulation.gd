@@ -20,7 +20,6 @@ var output_elements_compute_buffer: ComputeBuffer
 
 var simulation_image: Image
 var paused: bool = false
-var selected_element: Element = SAND_ELEMENT
 
 
 func _ready():
@@ -34,6 +33,7 @@ func _process(_delta: float) -> void:
 	get_window().title = "Living Pixels (FPS: " + str(Engine.get_frames_per_second()) + ")"
 	
 	# Add brush
+	params.mouse_pressed = false
 	if Input.is_action_pressed("add_element"): add_element()
 	
 	# Pause simulation
@@ -54,13 +54,14 @@ func _process(_delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.is_pressed():
 		match event.keycode:
-			KEY_1: selected_element = SAND_ELEMENT
-			KEY_2: selected_element = WATER_ELEMENT
-			KEY_3: selected_element = WOOD_ELEMENT
-			KEY_4: selected_element = GAS_ELEMENT
+			KEY_1: params.selected_element = SAND_ELEMENT
+			KEY_2: params.selected_element = WATER_ELEMENT
+			KEY_3: params.selected_element = WOOD_ELEMENT
+			KEY_4: params.selected_element = GAS_ELEMENT
 
 
 func setup_simulation() -> void:
+	params.selected_element = SAND_ELEMENT
 	simulation_image = Image.create(params.width, params.height, false, Image.FORMAT_RGBAH)
 	
 	input_elements.resize(params.width * params.height)
@@ -105,14 +106,8 @@ func cleanup_compute_shader() -> void:
 
 
 func add_element() -> void:
-	var add_position: Vector2i = get_viewport().get_mouse_position() / simulation_visualizer.scale
-	for i in [-1, 0, 1]:
-		if add_position.x + i < 0 or add_position.x + i >= params.width: continue
-		for j in [-1, 0, 1]:
-			if add_position.y + j < 0 or add_position.y + j >= params.height: continue
-			var add_id = (add_position.y + j) * params.width + (add_position.x + i)
-			input_elements[add_id] = selected_element;
-	input_elements_compute_buffer.set_bytes(Element.encode_elements(input_elements))
+	params.brush_position = get_viewport().get_mouse_position() / simulation_visualizer.scale
+	params.mouse_pressed = true
 
 
 func update_visualization() -> void:

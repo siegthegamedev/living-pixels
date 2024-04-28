@@ -27,6 +27,9 @@ struct UpdateOutput {
 layout(set = 0, binding = 0, std430) restrict readonly buffer ParamsBuffer {
     int width;
     int height;
+    ivec2 brush_position;
+    bool mouse_pressed;
+    Element selected_element;
     float vertical_rand;
     float horizontal_rand;
 } params;
@@ -53,6 +56,7 @@ void clear_output_buffer(uint x, uint y);
 void sync_threads(uint x, uint y);
 
 // Update Functions
+void update_brush(uint x, uint y);
 void update_vertical(Element element, uint x, uint y);
 void update_diagonal(Element element, uint x, uint y);
 void update_horizontal(Element element, uint x, uint y);
@@ -115,6 +119,12 @@ void sync_threads() {
  * Update Functions *
  ********************/
 
+void update_brush(uint x, uint y) {
+    if (abs(x - params.brush_position.x) <= 2 && abs(y - params.brush_position.y) <= 2) {
+        elements.data[get_index_from_position(x, y)] = params.selected_element;
+    }
+}
+
 void update_vertical(Element element, uint x, uint y) {
     element.updated = false;
     switch (element.id) {
@@ -173,7 +183,7 @@ UpdateOutput update_sand_diagonal(uint x, uint y) {
 }
 
 UpdateOutput update_sand_horizontal(uint x, uint y) {
-    return UpdateOutput(x, y, false);
+    return UpdateOutput(x, y, true);
 }
 
 /*********** Water ***********/
@@ -250,6 +260,11 @@ void main() {
     if (gl_GlobalInvocationID.x >= elements.data.length()) return;
     uint x = gl_GlobalInvocationID.x % params.width;
     uint y = gl_GlobalInvocationID.x / params.width;
+
+    if (params.mouse_pressed) {
+        update_brush(x, y);
+        sync_threads();
+    }
     
     update_vertical(elements.data[gl_GlobalInvocationID.x], x, y);
     
