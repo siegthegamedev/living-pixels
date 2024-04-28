@@ -4,6 +4,8 @@ extends Object
 const SIZEOF_INT: int = 4
 const SIZEOF_FLOAT: int = 4
 const SIZEOF_BOOL: int = 4
+const SIZEOF_VECTOR2: int = 2 * SIZEOF_FLOAT
+const SIZEOF_VECTOR2I: int = 2 * SIZEOF_INT
 
 
 static func sizeof_object(type: GDScript) -> int:
@@ -14,12 +16,16 @@ static func sizeof_object(type: GDScript) -> int:
 		if not (property_usage & PROPERTY_USAGE_SCRIPT_VARIABLE): continue
 		if not (property_usage & PROPERTY_USAGE_EDITOR): continue
 		match property_type:
-			TYPE_FLOAT:
-				size += SIZEOF_FLOAT
-			TYPE_INT:
-				size += SIZEOF_INT
 			TYPE_BOOL:
 				size += SIZEOF_BOOL
+			TYPE_INT:
+				size += SIZEOF_INT
+			TYPE_FLOAT:
+				size += SIZEOF_FLOAT
+			TYPE_VECTOR2:
+				size += SIZEOF_VECTOR2
+			TYPE_VECTOR2I:
+				size += SIZEOF_VECTOR2I
 	return size
 
 
@@ -32,12 +38,16 @@ static func encode_object(object: Object) -> PackedByteArray:
 		if not (property_usage & PROPERTY_USAGE_SCRIPT_VARIABLE): continue
 		if not (property_usage & PROPERTY_USAGE_EDITOR): continue
 		match property_type:
-			TYPE_FLOAT:
-				encode_float(packed_array, object[property_name])
-			TYPE_INT:
-				encode_int(packed_array, object[property_name])
 			TYPE_BOOL:
 				encode_bool(packed_array, object[property_name])
+			TYPE_INT:
+				encode_int(packed_array, object[property_name])
+			TYPE_FLOAT:
+				encode_float(packed_array, object[property_name])
+			TYPE_VECTOR2:
+				encode_vector2(packed_array, object[property_name])
+			TYPE_VECTOR2I:
+				encode_vector2i(packed_array, object[property_name])
 	return packed_array
 
 
@@ -58,15 +68,21 @@ static func decode_object(packed_array: PackedByteArray, type: GDScript) -> Obje
 		if not (property_usage & PROPERTY_USAGE_SCRIPT_VARIABLE): continue
 		if not (property_usage & PROPERTY_USAGE_EDITOR): continue
 		match property_type:
-			TYPE_FLOAT:
-				decoded_object[property_name] = decode_float(packed_array, byte_offset)
-				byte_offset += SIZEOF_FLOAT
-			TYPE_INT:
-				decoded_object[property_name] = decode_int(packed_array, byte_offset)
-				byte_offset += SIZEOF_FLOAT
 			TYPE_BOOL:
 				decoded_object[property_name] = decode_bool(packed_array, byte_offset)
 				byte_offset += SIZEOF_BOOL
+			TYPE_INT:
+				decoded_object[property_name] = decode_int(packed_array, byte_offset)
+				byte_offset += SIZEOF_FLOAT
+			TYPE_FLOAT:
+				decoded_object[property_name] = decode_float(packed_array, byte_offset)
+				byte_offset += SIZEOF_FLOAT
+			TYPE_VECTOR2:
+				decoded_object[property_name] = decode_vector2(packed_array, byte_offset)
+				byte_offset += SIZEOF_VECTOR2
+			TYPE_VECTOR2I:
+				decoded_object[property_name] = decode_vector2i(packed_array, byte_offset)
+				byte_offset += SIZEOF_VECTOR2I
 	return decoded_object
 
 
@@ -92,6 +108,14 @@ static func encode_float(packed_array: PackedByteArray, value: float) -> void:
 	packed_array.append_array(PackedFloat32Array([value]).to_byte_array())
 
 
+static func encode_vector2(packed_array: PackedByteArray, value: Vector2) -> void:
+	packed_array.append_array(PackedFloat32Array([value.x, value.y]).to_byte_array())
+
+
+static func encode_vector2i(packed_array: PackedByteArray, value: Vector2i) -> void:
+	packed_array.append_array(PackedInt32Array([value.x, value.y]).to_byte_array())
+
+
 static func decode_bool(packed_array: PackedByteArray, byte_offset: int) -> bool:
 	return packed_array.decode_u32(byte_offset) == 1
 
@@ -102,3 +126,15 @@ static func decode_int(packed_array: PackedByteArray, byte_offset: int) -> int:
 
 static func decode_float(packed_array: PackedByteArray, byte_offset: int) -> float:
 	return packed_array.decode_float(byte_offset)
+
+
+static func decode_vector2(packed_array: PackedByteArray, byte_offset: int) -> Vector2:
+	var x := packed_array.decode_float(byte_offset)
+	var y := packed_array.decode_float(byte_offset + SIZEOF_FLOAT)
+	return Vector2(x, y)
+
+
+static func decode_vector2i(packed_array: PackedByteArray, byte_offset: int) -> Vector2i:
+	var x := packed_array.decode_s32(byte_offset)
+	var y := packed_array.decode_s32(byte_offset + SIZEOF_INT)
+	return Vector2i(x, y)
