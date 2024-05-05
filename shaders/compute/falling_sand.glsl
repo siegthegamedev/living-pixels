@@ -42,6 +42,8 @@ layout(set = 0, binding = 2, std430) restrict buffer OutputElementsBuffer {
     Element data[];
 } output_elements;
 
+layout(rgba8, binding = 3) restrict writeonly uniform image2D output_texture;
+
 /*************************
  * Function Declarations *
  *************************/
@@ -54,6 +56,7 @@ void parse_update_output(Element element, UpdateOutput update_output);
 void sync_buffers(uint x, uint y);
 void clear_output_buffer(uint x, uint y);
 void sync_threads(uint x, uint y);
+vec4 get_element_base_color(uint element_id);
 
 // Update Functions
 void update_brush(uint x, uint y);
@@ -114,6 +117,17 @@ void sync_threads() {
     barrier();
     memoryBarrier();
     barrier();
+}
+
+vec4 get_element_base_color(uint element_id) {
+    switch (element_id) {
+        case 0: return vec4(0.0, 0.0, 0.0, 0.0);
+        case 1: return vec4(1.0, 0.921569, 0.803922, 1.0);
+        case 2: return vec4(0.117647, 0.564706, 1, 1);
+        case 3: return vec4(0.545098, 0.270588, 0.0745098, 1.0);
+        case 4: return vec4(1.0, 0.894118, 0.882353, 1.0);
+        default: return vec4(0.0, 0.0, 0.0, 1.0);
+    }
 }
 
 /********************
@@ -286,4 +300,6 @@ void main() {
     sync_threads();
     sync_buffers(x, y);
     clear_output_buffer(x, y);
+
+    imageStore(output_texture, ivec2(x, y), get_element_base_color(elements.data[gl_GlobalInvocationID.x].id));
 }

@@ -21,6 +21,8 @@ var output_elements_compute_buffer: ComputeBuffer
 var simulation_image: Image
 var paused: bool = false
 
+var output_texture_rid: RID
+
 
 func _ready():
 	print("Starting simulation")
@@ -82,6 +84,23 @@ func setup_compute_shader() -> void:
 	params_compute_buffer.set_data(params)
 	input_elements_compute_buffer.set_data(input_elements)
 	output_elements_compute_buffer.set_data(output_elements)
+	
+	var output_texture_format := RDTextureFormat.new()
+	output_texture_format.format = RenderingDevice.DATA_FORMAT_R8G8B8A8_UNORM
+	output_texture_format.width = params.width
+	output_texture_format.height = params.height
+	output_texture_format.usage_bits = RenderingDevice.TEXTURE_USAGE_STORAGE_BIT
+	output_texture_format.usage_bits += RenderingDevice.TEXTURE_USAGE_CAN_UPDATE_BIT
+	output_texture_format.usage_bits += RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
+	
+	output_texture_rid = falling_sand_compute_shader.rendering_device.texture_create(output_texture_format, RDTextureView.new())
+	
+	var output_texture_uniform = RDUniform.new()
+	output_texture_uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
+	output_texture_uniform.binding = 3
+	output_texture_uniform.add_id(output_texture_rid)
+	
+	falling_sand_compute_shader._add_uniform_to_set(output_texture_uniform, 0)
 
 
 func dispatch_compute_shader() -> void:
@@ -94,8 +113,10 @@ func dispatch_compute_shader() -> void:
 	falling_sand_compute_shader.sync()
 
 
-func get_compute_data() -> Array[Element]:
-	return Element.decode_elements(input_elements_compute_buffer.get_bytes(), input_elements.size())
+func get_texture_data() -> ImageTexture:
+	var output_texture_data := falling_sand_compute_shader.rendering_device.texture_get_data(output_texture_rid, 0)
+	var output_image := Image.create_from_data(params.width, params.height, false, Image.FORMAT_RGBA8, output_texture_data)
+	return ImageTexture.create_from_image(output_image)
 
 
 func cleanup_compute_shader() -> void:
@@ -112,13 +133,7 @@ func add_element() -> void:
 
 
 func update_visualization() -> void:
-	var elements := get_compute_data()
-	input_elements.assign(elements)
-	for x in params.width:
-		for y in params.height:
-			simulation_image.set_pixel(x, y, get_element_color(elements[y * params.width + x]))
-	
-	simulation_visualizer.texture = ImageTexture.create_from_image(simulation_image)
+	simulation_visualizer.texture = get_texture_data()
 	simulation_visualizer.scale = Vector2(get_window().size) / Vector2(params.width, params.height)
 
 
