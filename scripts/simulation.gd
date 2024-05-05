@@ -54,6 +54,7 @@ func _process(_delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.is_pressed():
 		match event.keycode:
+			KEY_0: params.selected_element = EMPTY_ELEMENT
 			KEY_1: params.selected_element = SAND_ELEMENT
 			KEY_2: params.selected_element = WATER_ELEMENT
 			KEY_3: params.selected_element = WOOD_ELEMENT
@@ -88,7 +89,7 @@ func dispatch_compute_shader() -> void:
 	params.horizontal_rand = randf()
 	
 	params_compute_buffer.set_bytes(params.encode())
-	falling_sand_compute_shader.setup_pipeline(4, 1, 1)
+	falling_sand_compute_shader.setup_pipeline(ceil(params.width * params.height / 1024.), 1, 1)
 	falling_sand_compute_shader.dispatch()
 	falling_sand_compute_shader.sync()
 
