@@ -17,6 +17,7 @@ var falling_sand_compute_shader: ComputeShader
 var params_compute_buffer: ComputeBuffer
 var input_elements_compute_buffer: ComputeBuffer
 var output_elements_compute_buffer: ComputeBuffer
+var output_texture_compute_texture: ComputeTexture
 
 var simulation_image: Image
 var paused: bool = false
@@ -93,14 +94,7 @@ func setup_compute_shader() -> void:
 	output_texture_format.usage_bits += RenderingDevice.TEXTURE_USAGE_CAN_UPDATE_BIT
 	output_texture_format.usage_bits += RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
 	
-	output_texture_rid = falling_sand_compute_shader.rendering_device.texture_create(output_texture_format, RDTextureView.new())
-	
-	var output_texture_uniform = RDUniform.new()
-	output_texture_uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
-	output_texture_uniform.binding = 3
-	output_texture_uniform.add_id(output_texture_rid)
-	
-	falling_sand_compute_shader._add_uniform_to_set(output_texture_uniform, 0)
+	output_texture_compute_texture = falling_sand_compute_shader.create_compute_texture(3, output_texture_format)
 
 
 func dispatch_compute_shader() -> void:
@@ -113,18 +107,11 @@ func dispatch_compute_shader() -> void:
 	falling_sand_compute_shader.sync()
 
 
-func get_texture_data() -> ImageTexture:
-	var output_texture_data := falling_sand_compute_shader.rendering_device.texture_get_data(output_texture_rid, 0)
-	var output_image := Image.create_from_data(params.width, params.height, false, Image.FORMAT_RGBA8, output_texture_data)
-	return ImageTexture.create_from_image(output_image)
-
-
 func cleanup_compute_shader() -> void:
-	falling_sand_compute_shader.dispose([
-		params_compute_buffer,
-		input_elements_compute_buffer, 
-		output_elements_compute_buffer
-	])
+	falling_sand_compute_shader.dispose(
+		[params_compute_buffer, input_elements_compute_buffer, output_elements_compute_buffer],
+		[output_texture_compute_texture]
+	)
 
 
 func add_element() -> void:
@@ -133,7 +120,7 @@ func add_element() -> void:
 
 
 func update_visualization() -> void:
-	simulation_visualizer.texture = get_texture_data()
+	simulation_visualizer.texture = output_texture_compute_texture.get_data_to_image_texture(Image.FORMAT_RGBA8)
 	simulation_visualizer.scale = Vector2(get_window().size) / Vector2(params.width, params.height)
 
 
