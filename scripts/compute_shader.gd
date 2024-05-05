@@ -37,6 +37,12 @@ func create_compute_buffer(set_index: int, binding_index: int) -> ComputeBuffer:
 	return cb
 
 
+func create_compute_texture(binding_index: int, texture_format: RDTextureFormat) -> ComputeTexture:
+	var ct := ComputeTexture.new(self, binding_index, texture_format)
+	_add_uniform_to_set(ct.uniform, 0)
+	return ct 
+
+
 func setup_pipeline(x_groups: int, y_groups: int, z_groups: int) -> void:
 	if _pipeline_setup:
 		rendering_device.free_rid(pipeline)
@@ -67,10 +73,12 @@ func sync() -> void:
 	synced.emit()
 
 
-func dispose(buffers_to_dispose: Array[ComputeBuffer]) -> void:
+func dispose(buffers_to_dispose: Array[ComputeBuffer], textures_to_dispose: Array[ComputeTexture]) -> void:
 	_free_uniform_sets()
 	for buffer: ComputeBuffer in buffers_to_dispose:
 		buffer.dispose()
+	for texture: ComputeTexture in textures_to_dispose:
+		texture.dispose()
 	rendering_device.free_rid(pipeline)
 	rendering_device.free_rid(shader)
 	rendering_device.free()
