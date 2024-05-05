@@ -24,6 +24,10 @@ struct UpdateOutput {
  * Compute Buffers *
  *******************/
 
+layout(push_constant) uniform Cosntants {
+    int stage;
+} constants;
+
 layout(set = 0, binding = 0, std430) restrict readonly buffer ParamsBuffer {
     int width;
     int height;
@@ -32,6 +36,7 @@ layout(set = 0, binding = 0, std430) restrict readonly buffer ParamsBuffer {
     Element selected_element;
     float vertical_rand;
     float horizontal_rand;
+    int stage;
 } params;
 
 layout(set = 0, binding = 1, std430) restrict buffer ElementsBuffer {
@@ -43,6 +48,14 @@ layout(set = 0, binding = 2, std430) restrict buffer OutputElementsBuffer {
 } output_elements;
 
 layout(rgba8, binding = 3) restrict writeonly uniform image2D output_texture;
+
+layout(set = 0, binding = 4, std430) restrict writeonly buffer DebugMetricsBuffer {
+    int empty_count;
+    int sand_count;
+    int water_count;
+    int wood_count;
+    int gas_count;
+} debug_metrics;
 
 /*************************
  * Function Declarations *
@@ -57,6 +70,8 @@ void sync_buffers(uint x, uint y);
 void clear_output_buffer(uint x, uint y);
 void sync_threads(uint x, uint y);
 vec4 get_element_base_color(uint element_id);
+void reset_debug_metrics();
+void update_debug_metrics(uint element_id);
 
 // Update Functions
 void update_brush(uint x, uint y);
@@ -94,7 +109,12 @@ bool is_cell_empty(uint x, uint y) {
     return elements.data[get_index_from_position(x, y)].id == 0;
 }
 
+bool is_output_cell_empty(uint x, uint y) {
+    return output_elements.data[get_index_from_position(x, y)].id == 0;
+}
+
 void set_output_cell(Element element, uint x, uint y) {
+    if (!is_output_cell_empty(x, y)) return;
     output_elements.data[get_index_from_position(x, y)] = element;
 }
 
@@ -130,14 +150,31 @@ vec4 get_element_base_color(uint element_id) {
     }
 }
 
+void reset_debug_metrics() {
+    atomicExchange(debug_metrics.empty_count, 0);
+    atomicExchange(debug_metrics.sand_count, 0);
+    atomicExchange(debug_metrics.water_count, 0);
+    atomicExchange(debug_metrics.wood_count, 0);
+    atomicExchange(debug_metrics.gas_count, 0);
+}
+
+void update_debug_metrics(uint element_id) {
+    switch (element_id) {
+        case 0: atomicAdd(debug_metrics.empty_count, 1); break;
+        case 1: atomicAdd(debug_metrics.sand_count, 1); break;
+        case 2: atomicAdd(debug_metrics.water_count, 1); break;
+        case 3: atomicAdd(debug_metrics.wood_count, 1); break;
+        case 4: atomicAdd(debug_metrics.gas_count, 1); break;
+    }
+}
+
 /********************
  * Update Functions *
  ********************/
 
 void update_brush(uint x, uint y) {
-    if (abs(x - params.brush_position.x) <= 2 && abs(y - params.brush_position.y) <= 2) {
+    if (abs(x - params.brush_position.x) <= 2 && abs(y - params.brush_position.y) <= 2)
         elements.data[get_index_from_position(x, y)] = params.selected_element;
-    }
 }
 
 void update_vertical(Element element, uint x, uint y) {
@@ -271,35 +308,85 @@ UpdateOutput update_gas_horizontal(uint x, uint y) {
  * Main Function *
  *****************/
 
+// void main() {
+//     if (gl_GlobalInvocationID.x >= elements.data.length()) return;
+//     uint x = gl_GlobalInvocationID.x % params.width;
+//     uint y = gl_GlobalInvocationID.x / params.width;
+
+//     if (params.mouse_pressed) {
+//         update_brush(x, y);
+//         sync_threads();
+//     }
+    
+//     reset_debug_metrics();
+//     update_vertical(elements.data[gl_GlobalInvocationID.x], x, y);
+    
+//     sync_threads();
+//     sync_buffers(x, y);
+//     clear_output_buffer(x, y);
+//     sync_threads();
+
+//     update_diagonal(elements.data[gl_GlobalInvocationID.x], x, y);
+    
+//     sync_threads();
+//     sync_buffers(x, y);
+//     clear_output_buffer(x, y);
+//     sync_threads();
+    
+//     update_horizontal(elements.data[gl_GlobalInvocationID.x], x, y);
+    
+//     sync_threads();
+//     sync_buffers(x, y);
+//     clear_output_buffer(x, y);
+//     sync_threads();
+
+//     update_debug_metrics(elements.data[gl_GlobalInvocationID.x].id);
+//     imageStore(output_texture, ivec2(x, y), get_element_base_color(elements.data[gl_GlobalInvocationID.x].id));
+// }
+
 void main() {
     if (gl_GlobalInvocationID.x >= elements.data.length()) return;
     uint x = gl_GlobalInvocationID.x % params.width;
     uint y = gl_GlobalInvocationID.x / params.width;
 
-    if (params.mouse_pressed) {
-        update_brush(x, y);
-        sync_threads();
+    switch (constants.stage) {
+        case 0: { // Input stage
+            if (params.mouse_pressed) update_brush(x, y);
+            break;   
+        }
+        case 1: { // Vertical movement stage
+            reset_debug_metrics();
+            update_vertical(elements.data[gl_GlobalInvocationID.x], x, y);
+            break;
+        }
+        case 2: { // Buffer swap stage 1
+            sync_buffers(x, y);
+            clear_output_buffer(x, y);
+            break;
+        }
+        case 3: { // Diagonal movement stage
+            update_diagonal(elements.data[gl_GlobalInvocationID.x], x, y);
+            break;
+        }
+        case 4: { // Buffer swap stage 2
+            sync_buffers(x, y);
+            clear_output_buffer(x, y);
+            break;
+        }
+        case 5: { // Horizontal movement stage
+            update_horizontal(elements.data[gl_GlobalInvocationID.x], x, y);
+            break;
+        }
+        case 6: { // Buffer swap stage 3
+            sync_buffers(x, y);
+            clear_output_buffer(x, y);
+            break;
+        }
+        case 7: { // Final stage
+            update_debug_metrics(elements.data[gl_GlobalInvocationID.x].id);
+            imageStore(output_texture, ivec2(x, y), get_element_base_color(elements.data[gl_GlobalInvocationID.x].id));
+            break;
+        }
+        default: return;
     }
-    
-    update_vertical(elements.data[gl_GlobalInvocationID.x], x, y);
-    
-    sync_threads();
-    sync_buffers(x, y);
-    clear_output_buffer(x, y);
-    sync_threads();
-
-    update_diagonal(elements.data[gl_GlobalInvocationID.x], x, y);
-    
-    sync_threads();
-    sync_buffers(x, y);
-    clear_output_buffer(x, y);
-    sync_threads();
-    
-    update_horizontal(elements.data[gl_GlobalInvocationID.x], x, y);
-    
-    sync_threads();
-    sync_buffers(x, y);
-    clear_output_buffer(x, y);
-
-    imageStore(output_texture, ivec2(x, y), get_element_base_color(elements.data[gl_GlobalInvocationID.x].id));
 }

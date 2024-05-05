@@ -39,6 +39,10 @@ func set_bytes(data: PackedByteArray) -> void:
 	_data_set = true
 
 
+func update_bytes(data: PackedByteArray) -> void:
+	rendering_device.buffer_update(buffer, 0, data.size(), data)
+
+
 func get_data() -> Array:
 	var output_bytes := rendering_device.buffer_get_data(buffer)
 	return Packing.decode_objects(output_bytes, _buffer_type, _buffer_size)

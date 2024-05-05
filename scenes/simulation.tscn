@@ -1,24 +1,63 @@
-[gd_scene load_steps=4 format=3 uid="uid://bve6cl40135j1"]
+[gd_scene load_steps=5 format=3 uid="uid://bve6cl40135j1"]
 
 [ext_resource type="Script" path="res://scripts/simulation.gd" id="1_c87s1"]
 [ext_resource type="Script" path="res://scripts/simulation_params.gd" id="2_cqhuj"]
 
 [sub_resource type="Resource" id="Resource_577jf"]
 script = ExtResource("2_cqhuj")
-width = 64
-height = 64
+width = 128
+height = 128
 brush_position = Vector2i(0, 0)
 mouse_pressed = false
 vertical_rand = 0.0
 horizontal_rand = 0.0
+stage = 0
 
-[node name="Simulation" type="Node" node_paths=PackedStringArray("simulation_visualizer")]
+[sub_resource type="Theme" id="Theme_yffox"]
+MarginContainer/constants/margin_bottom = 20
+MarginContainer/constants/margin_left = 20
+MarginContainer/constants/margin_right = 20
+MarginContainer/constants/margin_top = 20
+
+[node name="Simulation" type="Node" node_paths=PackedStringArray("simulation_visualizer", "debug_labels")]
 script = ExtResource("1_c87s1")
 simulation_visualizer = NodePath("SimulationVisualizer")
 params = SubResource("Resource_577jf")
+debug_labels = [NodePath("DebugMetrics/VBoxContainer/EmptyCount"), NodePath("DebugMetrics/VBoxContainer/SandCount"), NodePath("DebugMetrics/VBoxContainer/WaterCount"), NodePath("DebugMetrics/VBoxContainer/WoodCount"), NodePath("DebugMetrics/VBoxContainer/GasCount")]
 
 [node name="SimulationVisualizer" type="Sprite2D" parent="."]
 texture_filter = 1
 texture_repeat = 1
 scale = Vector2(12.5, 12.5)
 centered = false
+
+[node name="DebugMetrics" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_yffox")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DebugMetrics"]
+layout_mode = 2
+
+[node name="EmptyCount" type="Label" parent="DebugMetrics/VBoxContainer"]
+layout_mode = 2
+text = "Empty: 0"
+
+[node name="SandCount" type="Label" parent="DebugMetrics/VBoxContainer"]
+layout_mode = 2
+text = "Sand: 0"
+
+[node name="WaterCount" type="Label" parent="DebugMetrics/VBoxContainer"]
+layout_mode = 2
+text = "Water: 0"
+
+[node name="WoodCount" type="Label" parent="DebugMetrics/VBoxContainer"]
+layout_mode = 2
+text = "Wood: 0"
+
+[node name="GasCount" type="Label" parent="DebugMetrics/VBoxContainer"]
+layout_mode = 2
+text = "Gas: 0"
