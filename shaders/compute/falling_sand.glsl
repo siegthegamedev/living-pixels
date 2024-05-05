@@ -111,6 +111,7 @@ void clear_output_buffer(uint x, uint y) {
 }
 
 void sync_threads() {
+    barrier();
     memoryBarrier();
     barrier();
 }
