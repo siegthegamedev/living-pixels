@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://dcyno2mjq0gtd"
+path="res://.godot/imported/wood.glsl-632049419cd7c143bb8b5b5f82f6465b.res"
+
+[deps]
+
+source_file="res://shaders/compute/includes/elements/wood.glsl"
+dest_files=["res://.godot/imported/wood.glsl-632049419cd7c143bb8b5b5f82f6465b.res"]
+
+[params]
+

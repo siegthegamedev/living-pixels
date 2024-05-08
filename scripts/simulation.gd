@@ -89,7 +89,6 @@ func setup_compute_shader() -> void:
 	input_elements_compute_buffer.set_data(input_elements)
 	output_elements_compute_buffer.set_data(output_elements)
 	debug_metrics_compute_buffer.set_data(debug_metrics)
-	
 
 
 func dispatch_compute_shader() -> void:
