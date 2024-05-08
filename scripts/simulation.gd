@@ -78,17 +78,29 @@ func setup_simulation() -> void:
 
 
 func setup_compute_shader() -> void:
-	falling_sand_compute_shader = ComputeShader.from_file("res://shaders/compute/falling_sand.glsl")
+	falling_sand_compute_shader = ComputeShader.new()
+	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/input_stage.glsl")
+	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/vertical_stage.glsl")
+	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/swap_stage.glsl")
+	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/diagonal_stage.glsl")
+	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/swap_stage.glsl")
+	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/horizontal_stage.glsl")
+	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/swap_stage.glsl")
+	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/final_stage.glsl")
+	
 	params_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 0)
 	input_elements_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 1)
 	output_elements_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 2)
 	output_texture_compute_texture = falling_sand_compute_shader.create_compute_texture(3, get_output_texture_format())
 	debug_metrics_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 4)
 	
+	
 	params_compute_buffer.set_bytes(params.encode())
 	input_elements_compute_buffer.set_data(input_elements)
 	output_elements_compute_buffer.set_data(output_elements)
 	debug_metrics_compute_buffer.set_data(debug_metrics)
+	
+	falling_sand_compute_shader.setup()
 
 
 func dispatch_compute_shader() -> void:
@@ -96,34 +108,11 @@ func dispatch_compute_shader() -> void:
 	params.horizontal_rand = randf()
 	
 	params_compute_buffer.update_bytes(params.encode())
-	#params_compute_buffer.set_bytes(params.encode())
-	
-	var pipeline := falling_sand_compute_shader.rendering_device.compute_pipeline_create(falling_sand_compute_shader.shader)
-	var compute_list := falling_sand_compute_shader.rendering_device.compute_list_begin()
-	falling_sand_compute_shader.rendering_device.compute_list_bind_compute_pipeline(compute_list, pipeline)
-	for set_index: int in falling_sand_compute_shader.uniform_sets:
-		var uniform_set := falling_sand_compute_shader.rendering_device.uniform_set_create(falling_sand_compute_shader.uniform_sets[set_index], falling_sand_compute_shader.shader, set_index)
-		falling_sand_compute_shader.rendering_device.compute_list_bind_uniform_set(compute_list, uniform_set, set_index)
-		falling_sand_compute_shader._uniform_sets.append(uniform_set)
-	for i in 8:
-		falling_sand_compute_shader.rendering_device.compute_list_set_push_constant(compute_list, PackedInt32Array([i]).to_byte_array(), 16)
-		falling_sand_compute_shader.rendering_device.compute_list_dispatch(compute_list, ceil(params.width * params.height / 1024.), 1, 1)
-		falling_sand_compute_shader.rendering_device.compute_list_add_barrier(compute_list)
-	falling_sand_compute_shader.rendering_device.compute_list_end()
-	
-	falling_sand_compute_shader.rendering_device.submit()
-	falling_sand_compute_shader.rendering_device.sync()
-	
-	#falling_sand_compute_shader.setup_pipeline(ceil(params.width * params.height / 1024.), 1, 1)
-	#falling_sand_compute_shader.dispatch()
-	#falling_sand_compute_shader.sync()
+	falling_sand_compute_shader.dispatch(ceil(params.width * params.height / 1024.), 1, 1)
 
 
 func cleanup_compute_shader() -> void:
-	falling_sand_compute_shader.dispose(
-		[params_compute_buffer, input_elements_compute_buffer, output_elements_compute_buffer],
-		[output_texture_compute_texture]
-	)
+	falling_sand_compute_shader.dispose()
 
 
 func add_element() -> void:

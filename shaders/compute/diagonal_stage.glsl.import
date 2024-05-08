@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://cmv4kmmdrwtbe"
+path="res://.godot/imported/diagonal_stage.glsl-5a8b63f19f041e28156515696e44ed97.res"
+
+[deps]
+
+source_file="res://shaders/compute/diagonal_stage.glsl"
+dest_files=["res://.godot/imported/diagonal_stage.glsl-5a8b63f19f041e28156515696e44ed97.res"]
+
+[params]
+

@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://olduywyvelqh"
+path="res://.godot/imported/swap_stage.glsl-41aaff55415784c47e7d7699a8b2bb96.res"
+
+[deps]
+
+source_file="res://shaders/compute/swap_stage.glsl"
+dest_files=["res://.godot/imported/swap_stage.glsl-41aaff55415784c47e7d7699a8b2bb96.res"]
+
+[params]
+

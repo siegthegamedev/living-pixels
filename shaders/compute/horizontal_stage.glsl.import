@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://bygl8y7rv2jl4"
+path="res://.godot/imported/horizontal_stage.glsl-3298b3eb95e18b637032df299272d940.res"
+
+[deps]
+
+source_file="res://shaders/compute/horizontal_stage.glsl"
+dest_files=["res://.godot/imported/horizontal_stage.glsl-3298b3eb95e18b637032df299272d940.res"]
+
+[params]
+

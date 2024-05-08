@@ -2,10 +2,6 @@
  * Compute Buffers *
  *******************/
 
-layout(push_constant) uniform Cosntants {
-    int stage;
-} constants;
-
 layout(set = 0, binding = 0, std430) restrict readonly buffer ParamsBuffer {
     int width;
     int height;
