@@ -11,8 +11,6 @@ const GAS_ELEMENT:   Element = preload("res://resources/elements/gas.tres")
 @export var params: SimulationParams
 @export var debug_labels: Array[Label]
 
-var input_elements: Array[Element]
-var output_elements: Array[Element]
 var debug_metrics: SimulationDebugMetrics
 
 var falling_sand_compute_shader: ComputeShader
@@ -68,13 +66,6 @@ func _input(event: InputEvent) -> void:
 func setup_simulation() -> void:
 	params.selected_element = SAND_ELEMENT
 	debug_metrics = SimulationDebugMetrics.new()
-	
-	input_elements.resize(params.width * params.height)
-	output_elements.resize(params.width * params.height)
-	
-	for i in params.width * params.height:
-		input_elements[i] = EMPTY_ELEMENT
-		output_elements[i] = EMPTY_ELEMENT
 
 
 func setup_compute_shader() -> void:
@@ -88,17 +79,13 @@ func setup_compute_shader() -> void:
 	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/swap_stage.glsl")
 	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/final_stage.glsl")
 	
-	params_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 0)
-	input_elements_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 1)
-	output_elements_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 2)
+	params_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 0, 1, SimulationParams)
+	input_elements_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 1, params.width * params.height, Element)
+	output_elements_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 2, params.width * params.height, Element)
 	output_texture_compute_texture = falling_sand_compute_shader.create_compute_texture(3, get_output_texture_format())
-	debug_metrics_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 4)
-	
+	debug_metrics_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 4, 1, SimulationDebugMetrics)
 	
 	params_compute_buffer.set_bytes(params.encode())
-	input_elements_compute_buffer.set_data(input_elements)
-	output_elements_compute_buffer.set_data(output_elements)
-	debug_metrics_compute_buffer.set_data(debug_metrics)
 	
 	falling_sand_compute_shader.setup()
 

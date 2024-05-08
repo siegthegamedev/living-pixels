@@ -26,6 +26,14 @@ static func sizeof_object(type: GDScript) -> int:
 				size += SIZEOF_VECTOR2
 			TYPE_VECTOR2I:
 				size += SIZEOF_VECTOR2I
+			TYPE_OBJECT:
+				var object_class_name: String = property["class_name"]
+				var class_data := ProjectSettings.get_global_class_list().filter(func(data): return data["class"] == object_class_name)
+				
+				var script: GDScript
+				if class_data.size() == 0: script = ClassDB.instantiate(object_class_name).get_script()
+				else: script = load(class_data[0]["path"])
+				size += Packing.sizeof_object(script)
 	return size
 
 

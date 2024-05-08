@@ -24,8 +24,8 @@ func _init() -> void:
 	rendering_device = RenderingServer.create_local_rendering_device()
 
 
-func create_compute_buffer(set_index: int, binding_index: int) -> ComputeBuffer:
-	var cb := ComputeBuffer.new(self, binding_index)
+func create_compute_buffer(set_index: int, binding_index: int, count: int, type: GDScript) -> ComputeBuffer:
+	var cb := ComputeBuffer.new(self, binding_index, count, type)
 	_add_uniform_to_set(cb.uniform, set_index)
 	return cb
 
