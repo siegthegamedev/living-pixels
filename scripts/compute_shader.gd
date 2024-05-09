@@ -27,12 +27,14 @@ func _init() -> void:
 func create_compute_buffer(set_index: int, binding_index: int, count: int, type: GDScript) -> ComputeBuffer:
 	var cb := ComputeBuffer.new(self, binding_index, count, type)
 	_add_uniform_to_set(cb.uniform, set_index)
+	_buffers_to_dispose.append(cb)
 	return cb
 
 
 func create_compute_texture(binding_index: int, texture_format: RDTextureFormat) -> ComputeTexture:
 	var ct := ComputeTexture.new(self, binding_index, texture_format)
 	_add_uniform_to_set(ct.uniform, 0)
+	_textures_to_dispose.append(ct)
 	return ct 
 
 
@@ -95,6 +97,6 @@ func _add_uniform_to_set(uniform: RDUniform, set_index: int) -> void:
 
 func _free_uniform_sets() -> void:
 	for uniform_set in _uniform_sets:
-		if not rendering_device.uniform_set_is_valid(uniform_set): continue
-		rendering_device.free_rid(uniform_set)
+		if not rendering_device.uniform_set_is_valid(uniform_set[0]): continue
+		rendering_device.free_rid(uniform_set[0])
 	_uniforms_dict.clear()

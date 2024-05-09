@@ -47,6 +47,7 @@ func _process(_delta: float) -> void:
 	
 	# Cleanup the simulation
 	if Input.is_action_just_pressed("ui_cancel"):
+		paused = true
 		print("Cleaning up compute shader")
 		cleanup_compute_shader()
 		await self.get_tree().create_timer(0.1).timeout

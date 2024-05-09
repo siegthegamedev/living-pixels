@@ -45,6 +45,7 @@ func decode(data: PackedByteArray) -> Object:
 
 
 func decode_array(data: PackedByteArray, count: int) -> Array[Object]:
+	@warning_ignore("integer_division")
 	assert(data.size() / _packer_stride == count)
 	var objects: Array[Object] = []
 	for i in count:
