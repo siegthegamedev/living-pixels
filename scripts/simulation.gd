@@ -94,7 +94,7 @@ func dispatch_compute_shader() -> void:
 	params.vertical_rand = randf()
 	params.horizontal_rand = randf()
 	
-	params_compute_buffer.update_bytes(params.encode())
+	params_compute_buffer.set_bytes(params.encode())
 	falling_sand_compute_shader.dispatch(ceil(params.width * params.height / 1024.), 1, 1)
 
 

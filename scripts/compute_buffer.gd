@@ -5,6 +5,7 @@ var rendering_device: RenderingDevice
 var buffer: RID
 var uniform: RDUniform
 
+var _packer: Packer
 var _data_bytes: PackedByteArray = []
 var _buffer_count: int = -1
 var _buffer_type: GDScript = null
@@ -14,6 +15,7 @@ func _init(compute_shader: ComputeShader, binding_index: int, count: int, type: 
 	compute_shader.dispatched.connect(_on_shader_dispatch)
 	compute_shader.synced.connect(_on_shader_sync)
 	
+	_packer = Packer.new(type)
 	_buffer_count = count
 	_buffer_type = type
 	_data_bytes.resize(count * Packing.sizeof_object(type))
@@ -29,25 +31,12 @@ func _init(compute_shader: ComputeShader, binding_index: int, count: int, type: 
 
 func set_data(data: Variant) -> void:
 	data = data if data is Array else [data]
-	
 	assert(data.size() == _buffer_count)
 	assert(data[0].get_script() == _buffer_type)
-	
-	_buffer_count = data.size()
-	_buffer_type = data[0].get_script()
-	_data_bytes = Packing.encode_objects(data)
-	set_bytes(_data_bytes)
+	set_bytes(_packer.encode_array(data))
 
 
 func set_bytes(data: PackedByteArray) -> void:
-	assert(data.size() == Packing.sizeof_object(_buffer_type) * _buffer_count)
-	
-	buffer = rendering_device.storage_buffer_create(data.size(), data)
-	uniform.clear_ids()
-	uniform.add_id(buffer)
-
-
-func update_bytes(data: PackedByteArray) -> void:
 	assert(data.size() == Packing.sizeof_object(_buffer_type) * _buffer_count)
 	
 	rendering_device.buffer_update(buffer, 0, data.size(), data)
