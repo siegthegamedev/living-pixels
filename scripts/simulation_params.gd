@@ -5,7 +5,7 @@ extends Resource
 @export var height: int
 @export var brush_position: Vector2i
 @export var mouse_pressed: bool
-@export var selected_element: Element
+@export var selected_element: Element = Element.new()
 @export var vertical_rand: float
 @export var horizontal_rand: float
 @export var stage: int

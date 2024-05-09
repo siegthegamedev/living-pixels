@@ -37,6 +37,87 @@ static func sizeof_object(type: GDScript) -> int:
 	return size
 
 
+static func get_property_names_array(type: GDScript) -> Array[String]:
+	var property_names: Array[String] = []
+	for property in type.get_script_property_list():
+		var property_type: int = property["type"]
+		var property_usage: int = property["usage"]
+		if not (property_usage & PROPERTY_USAGE_SCRIPT_VARIABLE): continue
+		if not (property_usage & PROPERTY_USAGE_EDITOR): continue
+		match property_type:
+			TYPE_BOOL, TYPE_INT, TYPE_FLOAT, TYPE_VECTOR2, TYPE_VECTOR2I:
+				property_names.append(property["name"])
+			TYPE_OBJECT:
+				var object_class_name: String = property["class_name"]
+				var class_data := ProjectSettings.get_global_class_list().filter(func(data): return data["class"] == object_class_name)
+				
+				var script: GDScript
+				if class_data.size() == 0: script = ClassDB.instantiate(object_class_name).get_script()
+				else: script = load(class_data[0]["path"])
+				for object_property_name: String in get_property_names_array(script):
+					property_names.append(property["name"] + "." + object_property_name)
+	return property_names
+
+
+static func get_property_sizes_array(type: GDScript) -> Array[int]:
+	var sizes: Array[int] = []
+	for property in type.get_script_property_list():
+		var property_type: int = property["type"]
+		var property_usage: int = property["usage"]
+		if not (property_usage & PROPERTY_USAGE_SCRIPT_VARIABLE): continue
+		if not (property_usage & PROPERTY_USAGE_EDITOR): continue
+		match property_type:
+			TYPE_BOOL:
+				sizes.append(SIZEOF_BOOL)
+			TYPE_INT:
+				sizes.append(SIZEOF_INT)
+			TYPE_FLOAT:
+				sizes.append(SIZEOF_FLOAT)
+			TYPE_VECTOR2:
+				sizes.append(SIZEOF_VECTOR2)
+			TYPE_VECTOR2I:
+				sizes.append(SIZEOF_VECTOR2I)
+			TYPE_OBJECT:
+				var object_class_name: String = property["class_name"]
+				var class_data := ProjectSettings.get_global_class_list().filter(func(data): return data["class"] == object_class_name)
+				
+				var script: GDScript
+				if class_data.size() == 0: script = ClassDB.instantiate(object_class_name).get_script()
+				else: script = load(class_data[0]["path"])
+				sizes.append_array(get_property_sizes_array(script))
+	return sizes
+
+
+static func get_function_names(type: GDScript, encode: bool) -> Array[String]:
+	var function_type: String = "encode" if encode else "decode"
+	var function_names: Array[String] = []
+	for property in type.get_script_property_list():
+		var property_type: int = property["type"]
+		var property_usage: int = property["usage"]
+		if not (property_usage & PROPERTY_USAGE_SCRIPT_VARIABLE): continue
+		if not (property_usage & PROPERTY_USAGE_EDITOR): continue
+		match property_type:
+			TYPE_BOOL:
+				function_names.append("Packing." + function_type + "_bool")
+			TYPE_INT:
+				function_names.append("Packing." + function_type + "_int")
+			TYPE_FLOAT:
+				function_names.append("Packing." + function_type + "_float")
+			TYPE_VECTOR2:
+				function_names.append("Packing." + function_type + "_vector2")
+			TYPE_VECTOR2I:
+				function_names.append("Packing." + function_type + "_vector2i")
+			TYPE_OBJECT:
+				var object_class_name: String = property["class_name"]
+				var class_data := ProjectSettings.get_global_class_list().filter(func(data): return data["class"] == object_class_name)
+				
+				var script: GDScript
+				if class_data.size() == 0: script = ClassDB.instantiate(object_class_name).get_script()
+				else: script = load(class_data[0]["path"])
+				function_names.append_array(Packing.get_function_names(script, encode))
+	return function_names
+
+
 static func encode_object(object: Object) -> PackedByteArray:
 	var packed_array := PackedByteArray()
 	for property in object.get_script().get_script_property_list():
