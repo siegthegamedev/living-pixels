@@ -1,3 +1,4 @@
+@tool
 class_name Simulation
 extends Node
 
@@ -7,6 +8,15 @@ const WATER_ELEMENT: Element = preload("res://resources/elements/water.tres")
 const WOOD_ELEMENT:  Element = preload("res://resources/elements/wood.tres")
 const GAS_ELEMENT:   Element = preload("res://resources/elements/gas.tres")
 
+@export var element_descriptors: Array[ElementDescriptor]
+@export_file(".glsl") var elements_code_path: String
+@export var regenerate_shader_code: bool = false :
+	get:
+		return regenerate_shader_code
+	set(value):
+		print("hello!")
+		update_elements_code()
+		regenerate_shader_code = false
 @export var simulation_visualizer: Sprite2D
 @export var params: SimulationParams
 @export var debug_labels: Array[Label]
@@ -24,13 +34,19 @@ var paused: bool = false
 
 
 func _ready():
+	if Engine.is_editor_hint(): return
+	
 	print("Starting simulation")
+	
+	update_elements_code()
 	setup_simulation()
 	setup_compute_shader()
 	update_visualization()
 
 
 func _process(_delta: float) -> void:
+	if Engine.is_editor_hint(): return
+	
 	get_window().title = "Living Pixels (FPS: " + str(Engine.get_frames_per_second()) + ")"
 	
 	# Add brush
@@ -147,3 +163,14 @@ func get_output_texture_format() -> RDTextureFormat:
 	texture_format.usage_bits += RenderingDevice.TEXTURE_USAGE_CAN_UPDATE_BIT
 	texture_format.usage_bits += RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
 	return texture_format
+
+
+func update_elements_code() -> void:
+	var all_elements_code: String = ""
+	for descriptor in element_descriptors:
+		all_elements_code += descriptor.get_full_code()
+	var elements_code_file := FileAccess.open(elements_code_path, FileAccess.WRITE)
+	elements_code_file.store_string(all_elements_code)
+	elements_code_file.close()
+	
+	#get_editor_interface().get_resource_filesystem().scan_sources()

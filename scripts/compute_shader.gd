@@ -44,6 +44,15 @@ func add_stage_from_file(path: String) -> void:
 	_stages.push_back(rendering_device.shader_create_from_spirv(spirv))
 
 
+func add_stage_from_file_source(path: String) -> void:
+	var shader_string := FileAccess.get_file_as_string(path)
+	var shader_source := RDShaderSource.new()
+	shader_source.set_stage_source(RenderingDevice.SHADER_STAGE_COMPUTE, shader_string)
+	var spirv := rendering_device.shader_compile_spirv_from_source(shader_source)
+	print(spirv.get_stage_compile_error(RenderingDevice.SHADER_STAGE_COMPUTE))
+	_stages.push_back(rendering_device.shader_create_from_spirv(spirv))
+
+
 func setup() -> void:
 	# Create all uniform sets for each shader stage
 	for i in _stages.size():

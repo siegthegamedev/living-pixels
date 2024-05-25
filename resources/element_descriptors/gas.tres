@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ElementDescriptor" load_steps=2 format=3 uid="uid://beukfuqi1oee4"]
+
+[ext_resource type="Script" path="res://scripts/element_descriptor.gd" id="1_ubo7n"]
+
+[resource]
+script = ExtResource("1_ubo7n")
+id = 4
+name = "Gas"
+density = 0.0
+flamability = 0.0
+color = Color(0, 0, 0, 1)
+vertical_code = "if CAN_MOVE_UP MOVE_UP
+STAY"
+diagonal_code = "if CAN_MOVE_UP_RIGHT MOVE_UP_RIGHT
+if CAN_MOVE_UP_LEFT MOVE_UP_LEFT 
+STAY"
+horizontal_code = "if CAN_MOVE_RIGHT MOVE_RIGHT 
+if CAN_MOVE_LEFT MOVE_LEFT 
+STAY"
