@@ -8,7 +8,7 @@ id = 1
 name = "Sand"
 density = 0.0
 flamability = 0.0
-color = Color(0, 0, 0, 1)
+color = Color(1, 0.921569, 0.803922, 1)
 vertical_code = "if CAN_MOVE_DOWN MOVE_DOWN 
 STAY"
 diagonal_code = "if CAN_MOVE_DOWN_RIGHT MOVE_DOWN_RIGHT

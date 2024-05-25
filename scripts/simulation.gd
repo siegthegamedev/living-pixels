@@ -2,21 +2,7 @@
 class_name Simulation
 extends Node
 
-const EMPTY_ELEMENT: Element = preload("res://resources/elements/empty.tres")
-const SAND_ELEMENT:  Element = preload("res://resources/elements/sand.tres")
-const WATER_ELEMENT: Element = preload("res://resources/elements/water.tres")
-const WOOD_ELEMENT:  Element = preload("res://resources/elements/wood.tres")
-const GAS_ELEMENT:   Element = preload("res://resources/elements/gas.tres")
-
 @export var element_descriptors: Array[ElementDescriptor]
-@export_file(".glsl") var elements_code_path: String
-@export var regenerate_shader_code: bool = false :
-	get:
-		return regenerate_shader_code
-	set(value):
-		print("hello!")
-		update_elements_code()
-		regenerate_shader_code = false
 @export var simulation_visualizer: Sprite2D
 @export var params: SimulationParams
 @export var debug_labels: Array[Label]
@@ -28,6 +14,7 @@ var params_compute_buffer: ComputeBuffer
 var input_elements_compute_buffer: ComputeBuffer
 var output_elements_compute_buffer: ComputeBuffer
 var output_texture_compute_texture: ComputeTexture
+var element_descriptors_compute_buffer: ComputeBuffer
 var debug_metrics_compute_buffer: ComputeBuffer
 
 var paused: bool = false
@@ -72,15 +59,15 @@ func _physics_process(_delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.is_pressed():
 		match event.keycode:
-			KEY_0: params.selected_element = EMPTY_ELEMENT
-			KEY_1: params.selected_element = SAND_ELEMENT
-			KEY_2: params.selected_element = WATER_ELEMENT
-			KEY_3: params.selected_element = WOOD_ELEMENT
-			KEY_4: params.selected_element = GAS_ELEMENT
+			KEY_0: params.selected_element_id = 0
+			KEY_1: params.selected_element_id = 1
+			KEY_2: params.selected_element_id = 2
+			KEY_3: params.selected_element_id = 3
+			KEY_4: params.selected_element_id = 4
 
 
 func setup_simulation() -> void:
-	params.selected_element = SAND_ELEMENT
+	params.selected_element_id = 1
 	debug_metrics = SimulationDebugMetrics.new()
 
 
@@ -105,9 +92,11 @@ func setup_compute_shader() -> void:
 	input_elements_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 1, params.width * params.height, Element)
 	output_elements_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 2, params.width * params.height, Element)
 	output_texture_compute_texture = falling_sand_compute_shader.create_compute_texture(3, get_output_texture_format())
-	debug_metrics_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 4, 1, SimulationDebugMetrics)
+	element_descriptors_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 4, element_descriptors.size(), ElementDescriptor)
+	debug_metrics_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 5, 1, SimulationDebugMetrics)
 	
 	params_compute_buffer.set_bytes(params.encode())
+	element_descriptors_compute_buffer.set_bytes(ElementDescriptor.encode_array(element_descriptors))
 	
 	falling_sand_compute_shader.setup()
 
@@ -150,13 +139,7 @@ func update_debug_metrics() -> void:
 
 
 func get_element_color(element: Element) -> Color:
-	match element.id:
-		EMPTY_ELEMENT.id: return Color.TRANSPARENT
-		SAND_ELEMENT.id:  return Color.BLANCHED_ALMOND
-		WATER_ELEMENT.id: return Color.DARK_BLUE
-		WOOD_ELEMENT.id:  return Color.SADDLE_BROWN
-		GAS_ELEMENT.id:   return Color.MISTY_ROSE
-	return Color(0.0, 0.0, 0.0, 0.0)
+	return element_descriptors[element.id].color
 
 
 func get_output_texture_format() -> RDTextureFormat:
@@ -168,15 +151,6 @@ func get_output_texture_format() -> RDTextureFormat:
 	texture_format.usage_bits += RenderingDevice.TEXTURE_USAGE_CAN_UPDATE_BIT
 	texture_format.usage_bits += RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
 	return texture_format
-
-
-func update_elements_code() -> void:
-	var all_elements_code: String = ""
-	for descriptor in element_descriptors:
-		all_elements_code += descriptor.get_full_code()
-	var elements_code_file := FileAccess.open(elements_code_path, FileAccess.WRITE)
-	elements_code_file.store_string(all_elements_code)
-	elements_code_file.close()
 
 
 func get_elements_code() -> String:

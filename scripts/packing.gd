@@ -6,6 +6,7 @@ const SIZEOF_FLOAT: int = 4
 const SIZEOF_BOOL: int = 4
 const SIZEOF_VECTOR2: int = 2 * SIZEOF_FLOAT
 const SIZEOF_VECTOR2I: int = 2 * SIZEOF_INT
+const SIZEOF_COLOR: int = 4 * SIZEOF_FLOAT
 
 
 static func sizeof_object(type: GDScript) -> int:
@@ -26,6 +27,8 @@ static func sizeof_object(type: GDScript) -> int:
 				size += SIZEOF_VECTOR2
 			TYPE_VECTOR2I:
 				size += SIZEOF_VECTOR2I
+			TYPE_COLOR:
+				size += SIZEOF_COLOR
 			TYPE_OBJECT:
 				var object_class_name: String = property["class_name"]
 				var class_data := ProjectSettings.get_global_class_list().filter(func(data): return data["class"] == object_class_name)
@@ -45,7 +48,7 @@ static func get_property_names_array(type: GDScript) -> Array[String]:
 		if not (property_usage & PROPERTY_USAGE_SCRIPT_VARIABLE): continue
 		if not (property_usage & PROPERTY_USAGE_EDITOR): continue
 		match property_type:
-			TYPE_BOOL, TYPE_INT, TYPE_FLOAT, TYPE_VECTOR2, TYPE_VECTOR2I:
+			TYPE_BOOL, TYPE_INT, TYPE_FLOAT, TYPE_VECTOR2, TYPE_VECTOR2I, TYPE_COLOR:
 				property_names.append(property["name"])
 			TYPE_OBJECT:
 				var object_class_name: String = property["class_name"]
@@ -77,6 +80,8 @@ static func get_property_sizes_array(type: GDScript) -> Array[int]:
 				sizes.append(SIZEOF_VECTOR2)
 			TYPE_VECTOR2I:
 				sizes.append(SIZEOF_VECTOR2I)
+			TYPE_COLOR:
+				sizes.append(SIZEOF_COLOR)
 			TYPE_OBJECT:
 				var object_class_name: String = property["class_name"]
 				var class_data := ProjectSettings.get_global_class_list().filter(func(data): return data["class"] == object_class_name)
@@ -107,6 +112,8 @@ static func get_function_names(type: GDScript, encode: bool) -> Array[String]:
 				function_names.append("Packing." + function_type + "_vector2")
 			TYPE_VECTOR2I:
 				function_names.append("Packing." + function_type + "_vector2i")
+			TYPE_COLOR:
+				function_names.append("Packing." + function_type + "_color")
 			TYPE_OBJECT:
 				var object_class_name: String = property["class_name"]
 				var class_data := ProjectSettings.get_global_class_list().filter(func(data): return data["class"] == object_class_name)
@@ -137,6 +144,8 @@ static func encode_object(object: Object) -> PackedByteArray:
 				encode_vector2(packed_array, object[property_name])
 			TYPE_VECTOR2I:
 				encode_vector2i(packed_array, object[property_name])
+			TYPE_COLOR:
+				encode_color(packed_array, object[property_name])
 	return packed_array
 
 
@@ -172,6 +181,9 @@ static func decode_object(packed_array: PackedByteArray, type: GDScript) -> Obje
 			TYPE_VECTOR2I:
 				decoded_object[property_name] = decode_vector2i(packed_array, byte_offset)
 				byte_offset += SIZEOF_VECTOR2I
+			TYPE_COLOR:
+				decoded_object[property_name] = decode_color(packed_array, byte_offset)
+				byte_offset += SIZEOF_COLOR
 	return decoded_object
 
 
@@ -205,6 +217,10 @@ static func encode_vector2i(packed_array: PackedByteArray, value: Vector2i) -> v
 	packed_array.append_array(PackedInt32Array([value.x, value.y]).to_byte_array())
 
 
+static func encode_color(packed_array: PackedByteArray, value: Color) -> void:
+	packed_array.append_array(PackedFloat32Array([value.r, value.g, value.b, value.a]).to_byte_array())
+
+
 static func decode_bool(packed_array: PackedByteArray, byte_offset: int) -> bool:
 	return packed_array.decode_u32(byte_offset) == 1
 
@@ -227,3 +243,11 @@ static func decode_vector2i(packed_array: PackedByteArray, byte_offset: int) -> 
 	var x := packed_array.decode_s32(byte_offset)
 	var y := packed_array.decode_s32(byte_offset + SIZEOF_INT)
 	return Vector2i(x, y)
+
+
+static func decode_color(packed_array: PackedByteArray, byte_offset: int) -> Color:
+	var r := packed_array.decode_float(byte_offset)
+	var g := packed_array.decode_float(byte_offset + 1 * SIZEOF_FLOAT)
+	var b := packed_array.decode_float(byte_offset + 2 * SIZEOF_FLOAT)
+	var a := packed_array.decode_float(byte_offset + 3 * SIZEOF_FLOAT)
+	return Color(r, g, b, a)

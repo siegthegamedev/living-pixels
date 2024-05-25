@@ -14,3 +14,10 @@ struct UpdateOutput {
     uint y;
     bool updated;
 };
+
+struct ElementDescriptor {
+    int id;
+    float density;
+    float flamability;
+    vec4 color;
+};

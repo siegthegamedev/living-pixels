@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ElementDescriptor" load_steps=2 format=3 uid="uid://iu6rt35u5jym"]
+
+[ext_resource type="Script" path="res://scripts/element_descriptor.gd" id="1_83fix"]
+
+[resource]
+script = ExtResource("1_83fix")
+id = 0
+name = "Empty"
+density = 0.0
+flamability = 0.0
+color = Color(0, 0, 0, 0)
+vertical_code = "STAY_UPDATE"
+diagonal_code = "STAY_UPDATE"
+horizontal_code = "STAY_UPDATE"

@@ -8,7 +8,7 @@ id = 2
 name = "Water"
 density = 0.0
 flamability = 0.0
-color = Color(0, 0, 0, 1)
+color = Color(0.117647, 0.564706, 1, 1)
 vertical_code = "if CAN_MOVE_DOWN MOVE_DOWN
 STAY"
 diagonal_code = "if CAN_MOVE_DOWN_RIGHT MOVE_DOWN_RIGHT

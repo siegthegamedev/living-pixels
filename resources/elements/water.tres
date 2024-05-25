@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="Element" load_steps=2 format=3 uid="uid://bw2u0enx7ucji"]
-
-[ext_resource type="Script" path="res://scripts/element.gd" id="1_po5ye"]
-
-[resource]
-script = ExtResource("1_po5ye")
-id = 2
-density = 50.0
-flamability = 0.0

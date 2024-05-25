@@ -8,7 +8,7 @@ id = 4
 name = "Gas"
 density = 0.0
 flamability = 0.0
-color = Color(0, 0, 0, 1)
+color = Color(1, 0.894118, 0.882353, 1)
 vertical_code = "if CAN_MOVE_UP MOVE_UP
 STAY"
 diagonal_code = "if CAN_MOVE_UP_RIGHT MOVE_UP_RIGHT

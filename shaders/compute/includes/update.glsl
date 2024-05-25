@@ -3,8 +3,8 @@
  ********************/
 
 void update_brush(uint x, uint y) {
-    if (abs(x - params.brush_position.x) <= 2 && abs(y - params.brush_position.y) <= 2)
-        elements.data[get_index_from_position(x, y)] = params.selected_element;
+    if (!(abs(x - params.brush_position.x) <= 2 && abs(y - params.brush_position.y) <= 2)) return;
+    elements.data[get_index_from_position(x, y)] = get_element_from_descriptor(element_descriptors.data[params.selected_element_id]);
 }
 
 void update_vertical(Element element, uint x, uint y) {

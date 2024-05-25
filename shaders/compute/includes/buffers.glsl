@@ -7,7 +7,7 @@ layout(set = 0, binding = 0, std430) restrict readonly buffer ParamsBuffer {
     int height;
     ivec2 brush_position;
     bool mouse_pressed;
-    Element selected_element;
+    int selected_element_id;
     float vertical_rand;
     float horizontal_rand;
     int stage;
@@ -23,7 +23,11 @@ layout(set = 0, binding = 2, std430) restrict buffer OutputElementsBuffer {
 
 layout(rgba8, binding = 3) restrict writeonly uniform image2D output_texture;
 
-layout(set = 0, binding = 4, std430) restrict writeonly buffer DebugMetricsBuffer {
+layout(set = 0, binding = 4, std430) restrict buffer ElementDescriptorsBuffer {
+    ElementDescriptor data[];
+} element_descriptors;
+
+layout(set = 0, binding = 5, std430) restrict writeonly buffer DebugMetricsBuffer {
     int empty_count;
     int sand_count;
     int water_count;

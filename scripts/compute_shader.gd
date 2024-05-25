@@ -62,7 +62,11 @@ func add_stage_from_file_source(path: String) -> void:
 	var shader_source := RDShaderSource.new()
 	shader_source.set_stage_source(RenderingDevice.SHADER_STAGE_COMPUTE, shader_string)
 	var spirv := rendering_device.shader_compile_spirv_from_source(shader_source)
-	print(spirv.get_stage_compile_error(RenderingDevice.SHADER_STAGE_COMPUTE))
+	
+	var compile_errors := spirv.get_stage_compile_error(RenderingDevice.SHADER_STAGE_COMPUTE)
+	if compile_errors != "":
+		print(compile_errors)
+		print(shader_string)
 	_stages.push_back(rendering_device.shader_create_from_spirv(spirv))
 
 

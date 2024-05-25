@@ -2,6 +2,15 @@
  * Utility Functions *
  *********************/
 
+ Element get_element_from_descriptor(ElementDescriptor element_descriptor) {
+    Element element;
+    element.id = element_descriptor.id;
+    element.bool = false;
+    element.density = element_descriptor.density;
+    element.flamability = element_descriptor.flamability;
+    return element;
+ }
+
 uint get_index_from_position(uint x, uint y) {
     return y * params.width + x;
 }
@@ -41,14 +50,7 @@ void sync_threads() {
 }
 
 vec4 get_element_base_color(uint element_id) {
-    switch (element_id) {
-        case 0: return vec4(0.0, 0.0, 0.0, 0.0);
-        case 1: return vec4(1.0, 0.921569, 0.803922, 1.0);
-        case 2: return vec4(0.117647, 0.564706, 1, 1);
-        case 3: return vec4(0.545098, 0.270588, 0.0745098, 1.0);
-        case 4: return vec4(1.0, 0.894118, 0.882353, 1.0);
-        default: return vec4(0.0, 0.0, 0.0, 1.0);
-    }
+    return element_descriptors.data[element_id].color;
 }
 
 void reset_debug_metrics() {
