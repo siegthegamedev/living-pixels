@@ -5,7 +5,7 @@
  Element get_element_from_descriptor(ElementDescriptor element_descriptor) {
     Element element;
     element.id = element_descriptor.id;
-    element.bool = false;
+    element.updated = false;
     element.density = element_descriptor.density;
     element.flamability = element_descriptor.flamability;
     return element;
