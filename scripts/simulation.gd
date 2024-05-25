@@ -1,4 +1,3 @@
-@tool
 class_name Simulation
 extends Node
 
@@ -21,8 +20,6 @@ var paused: bool = false
 
 
 func _ready():
-	if Engine.is_editor_hint(): return
-	
 	print("Starting simulation")
 	
 	setup_simulation()
@@ -30,9 +27,7 @@ func _ready():
 	update_visualization()
 
 
-func _physics_process(_delta: float) -> void:
-	if Engine.is_editor_hint(): return
-	
+func _process(_delta: float) -> void:
 	get_window().title = "Living Pixels (FPS: " + str(Engine.get_frames_per_second()) + ")"
 	
 	# Add brush
@@ -42,7 +37,7 @@ func _physics_process(_delta: float) -> void:
 	# Pause simulation
 	if Input.is_action_just_pressed("simulation_toggle"): paused = not paused
 	
-	if not paused or Input.is_action_just_pressed("simulation_step"):
+	if not paused or Input.is_action_just_pressed("simulation_step"): 
 		dispatch_compute_shader()
 		update_visualization()
 		update_debug_metrics()

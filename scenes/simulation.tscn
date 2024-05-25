@@ -10,8 +10,8 @@
 
 [sub_resource type="Resource" id="Resource_577jf"]
 script = ExtResource("2_cqhuj")
-width = 128
-height = 128
+width = 256
+height = 256
 brush_position = Vector2i(0, 0)
 mouse_pressed = false
 selected_element_id = 0
