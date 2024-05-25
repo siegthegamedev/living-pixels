@@ -70,7 +70,7 @@ UpdateOutput update_{name}_horizontal(uint x, uint y) {
 """
 	
 	return code.format({
-		"name": name.to_lower(),
+		"name": name.to_lower().replace(" ", "_"),
 		"vertical_code": vertical_code.replace("\n", "\n\t"),
 		"diagonal_code": diagonal_code.replace("\n", "\n\t"),
 		"horizontal_code": horizontal_code.replace("\n", "\n\t")
@@ -80,21 +80,21 @@ UpdateOutput update_{name}_horizontal(uint x, uint y) {
 func get_vertical_case_code() -> String:
 	return "case {id}: parse_update_output(element, update_{name}_vertical(x, y)); break;".format({
 		"id": id,
-		"name": name.to_lower()
+		"name": name.to_lower().replace(" ", "_")
 	})
 
 
 func get_diagonal_case_code() -> String:
 	return "case {id}: parse_update_output(element, update_{name}_diagonal(x, y)); break;".format({
 		"id": id,
-		"name": name.to_lower()
+		"name": name.to_lower().replace(" ", "_")
 	})
 
 
 func get_horizontal_case_code() -> String:
 	return "case {id}: parse_update_output(element, update_{name}_horizontal(x, y)); break;".format({
 		"id": id,
-		"name": name.to_lower()
+		"name": name.to_lower().replace(" ", "_")
 	})
 
 
