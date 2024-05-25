@@ -6,6 +6,7 @@ layout(set = 0, binding = 0, std430) restrict readonly buffer ParamsBuffer {
     int width;
     int height;
     ivec2 brush_position;
+    int brush_size;
     bool mouse_pressed;
     int selected_element_id;
     float vertical_rand;
