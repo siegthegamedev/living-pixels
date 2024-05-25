@@ -53,12 +53,9 @@ func _process(_delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.is_pressed():
-		match event.keycode:
-			KEY_0: params.selected_element_id = 0
-			KEY_1: params.selected_element_id = 1
-			KEY_2: params.selected_element_id = 2
-			KEY_3: params.selected_element_id = 3
-			KEY_4: params.selected_element_id = 4
+		var selected_id: int = event.keycode - KEY_0
+		if selected_id > 0 && selected_id < element_descriptors.size():
+			params.selected_element_id = selected_id
 
 
 func setup_simulation() -> void:
@@ -150,7 +147,7 @@ func get_output_texture_format() -> RDTextureFormat:
 
 func get_elements_code() -> String:
 	var all_elements_code: String = ""
-	for descriptor in element_descriptors:
+	for descriptor in element_descriptors.slice(1):
 		all_elements_code += descriptor.get_full_code()
 	all_elements_code += ElementDescriptor.get_update_code(element_descriptors.slice(1))
 	return all_elements_code

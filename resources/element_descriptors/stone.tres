@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ElementDescriptor" load_steps=2 format=3 uid="uid://3epdajh3oahi"]
+
+[ext_resource type="Script" path="res://scripts/element_descriptor.gd" id="1_wq261"]
+
+[resource]
+script = ExtResource("1_wq261")
+id = 5
+name = "Empty"
+density = 0.0
+flamability = 0.0
+padding = 0.0
+color = Color(0.411765, 0.411765, 0.411765, 1)
+vertical_code = "if CAN_MOVE_DOWN MOVE_DOWN 
+STAY"
+diagonal_code = "STAY_UPDATE"
+horizontal_code = "STAY_UPDATE"
