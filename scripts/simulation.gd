@@ -152,4 +152,5 @@ func get_elements_code() -> String:
 	var all_elements_code: String = ""
 	for descriptor in element_descriptors:
 		all_elements_code += descriptor.get_full_code()
+	all_elements_code += ElementDescriptor.get_update_code(element_descriptors.slice(1))
 	return all_elements_code

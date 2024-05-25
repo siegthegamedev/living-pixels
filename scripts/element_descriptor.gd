@@ -12,6 +12,48 @@ extends Resource
 @export_multiline var horizontal_code: String
 
 
+static func get_update_code(descriptors: Array[ElementDescriptor]) -> String:
+	var code := """
+void update_vertical(Element element, uint x, uint y) {
+	element.updated = false;
+	switch (element.id) { {vertical_cases}
+		default: break;
+	}
+}
+
+void update_diagonal(Element element, uint x, uint y) {
+	if (!element.updated) {
+		switch (element.id) { {diagonal_cases}
+			default: break;
+		}
+	} else set_output_cell(element, x, y);
+}
+
+void update_horizontal(Element element, uint x, uint y) {
+	if (!element.updated) {
+		switch (element.id) { {horizontal_cases}
+			default: break;
+		}
+	} else set_output_cell(element, x, y);
+}
+"""
+	
+	var vertical_cases := ""
+	var diagonal_cases := ""
+	var horizontal_cases := ""
+	
+	for descriptor: ElementDescriptor in descriptors:
+		vertical_cases += "\n\t\t" + descriptor.get_vertical_case_code()
+		diagonal_cases += "\n\t\t\t" + descriptor.get_diagonal_case_code()
+		horizontal_cases += "\n\t\t\t" + descriptor.get_horizontal_case_code()
+	
+	return code.format({
+		"vertical_cases": vertical_cases,
+		"diagonal_cases": diagonal_cases,
+		"horizontal_cases": horizontal_cases,
+	})
+
+
 func get_full_code() -> String:
 	var code := """
 UpdateOutput update_{name}_vertical(uint x, uint y) {
@@ -32,6 +74,27 @@ UpdateOutput update_{name}_horizontal(uint x, uint y) {
 		"vertical_code": vertical_code.replace("\n", "\n\t"),
 		"diagonal_code": diagonal_code.replace("\n", "\n\t"),
 		"horizontal_code": horizontal_code.replace("\n", "\n\t")
+	})
+
+
+func get_vertical_case_code() -> String:
+	return "case {id}: parse_update_output(element, update_{name}_vertical(x, y)); break;".format({
+		"id": id,
+		"name": name.to_lower()
+	})
+
+
+func get_diagonal_case_code() -> String:
+	return "case {id}: parse_update_output(element, update_{name}_diagonal(x, y)); break;".format({
+		"id": id,
+		"name": name.to_lower()
+	})
+
+
+func get_horizontal_case_code() -> String:
+	return "case {id}: parse_update_output(element, update_{name}_horizontal(x, y)); break;".format({
+		"id": id,
+		"name": name.to_lower()
 	})
 
 
