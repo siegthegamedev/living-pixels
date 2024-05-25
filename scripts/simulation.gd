@@ -38,13 +38,12 @@ func _ready():
 	
 	print("Starting simulation")
 	
-	update_elements_code()
 	setup_simulation()
 	setup_compute_shader()
 	update_visualization()
 
 
-func _process(_delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	if Engine.is_editor_hint(): return
 	
 	get_window().title = "Living Pixels (FPS: " + str(Engine.get_frames_per_second()) + ")"
@@ -87,14 +86,20 @@ func setup_simulation() -> void:
 
 func setup_compute_shader() -> void:
 	falling_sand_compute_shader = ComputeShader.new()
-	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/input_stage.glsl")
-	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/vertical_stage.glsl")
-	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/swap_stage.glsl")
-	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/diagonal_stage.glsl")
-	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/swap_stage.glsl")
-	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/horizontal_stage.glsl")
-	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/swap_stage.glsl")
-	falling_sand_compute_shader.add_stage_from_file("res://shaders/compute/final_stage.glsl")
+	falling_sand_compute_shader.add_indclude_from_file("res://shaders/compute/includes/macros.glsl")
+	falling_sand_compute_shader.add_indclude_from_file("res://shaders/compute/includes/types.glsl")
+	falling_sand_compute_shader.add_indclude_from_file("res://shaders/compute/includes/buffers.glsl")
+	falling_sand_compute_shader.add_indclude_from_file("res://shaders/compute/includes/utils.glsl")
+	falling_sand_compute_shader.add_indclude_from_file("res://shaders/compute/includes/update.glsl")
+	falling_sand_compute_shader.add_include_from_string("elements", get_elements_code())
+	falling_sand_compute_shader.add_stage_from_file_source("res://shaders/compute/input_stage.glsl")
+	falling_sand_compute_shader.add_stage_from_file_source("res://shaders/compute/vertical_stage.glsl")
+	falling_sand_compute_shader.add_stage_from_file_source("res://shaders/compute/swap_stage.glsl")
+	falling_sand_compute_shader.add_stage_from_file_source("res://shaders/compute/diagonal_stage.glsl")
+	falling_sand_compute_shader.add_stage_from_file_source("res://shaders/compute/swap_stage.glsl")
+	falling_sand_compute_shader.add_stage_from_file_source("res://shaders/compute/horizontal_stage.glsl")
+	falling_sand_compute_shader.add_stage_from_file_source("res://shaders/compute/swap_stage.glsl")
+	falling_sand_compute_shader.add_stage_from_file_source("res://shaders/compute/final_stage.glsl")
 	
 	params_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 0, 1, SimulationParams)
 	input_elements_compute_buffer = falling_sand_compute_shader.create_compute_buffer(0, 1, params.width * params.height, Element)
@@ -172,5 +177,10 @@ func update_elements_code() -> void:
 	var elements_code_file := FileAccess.open(elements_code_path, FileAccess.WRITE)
 	elements_code_file.store_string(all_elements_code)
 	elements_code_file.close()
-	
-	#get_editor_interface().get_resource_filesystem().scan_sources()
+
+
+func get_elements_code() -> String:
+	var all_elements_code: String = ""
+	for descriptor in element_descriptors:
+		all_elements_code += descriptor.get_full_code()
+	return all_elements_code

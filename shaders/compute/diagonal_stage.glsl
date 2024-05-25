@@ -1,12 +1,16 @@
-#[compute]
 #version 450
 
-#include "includes/macros.glsl"
-#include "includes/types.glsl"
-#include "includes/buffers.glsl"
-#include "includes/utils.glsl"
-#include "includes/elements.glsl"
-#include "includes/update.glsl"
+{macros}
+
+{types}
+
+{buffers}
+
+{utils}
+
+{elements}
+
+{update}
 
 layout(local_size_x = 1024, local_size_y = 1, local_size_z = 1) in;
 void main() {

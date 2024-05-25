@@ -8,6 +8,7 @@ var rendering_device: RenderingDevice
 
 var _stages: Array[RID]
 var _pipelines: Array[RID]
+var _include_files:Dictionary
 var _uniforms_dict: Dictionary
 var _uniform_sets: Array = []
 var _buffers_to_dispose: Array[ComputeBuffer] = []
@@ -38,6 +39,16 @@ func create_compute_texture(binding_index: int, texture_format: RDTextureFormat)
 	return ct 
 
 
+func add_indclude_from_file(path: String) -> void:
+	var include_string := FileAccess.get_file_as_string(path)
+	var file_name := path.split("/")[-1].split(".")[0]
+	_include_files[file_name] = include_string
+
+
+func add_include_from_string(include_name: String, code: String) -> void:
+	_include_files[include_name] = code
+
+
 func add_stage_from_file(path: String) -> void:
 	var file := load(path)
 	var spirv = file.get_spirv()
@@ -46,6 +57,8 @@ func add_stage_from_file(path: String) -> void:
 
 func add_stage_from_file_source(path: String) -> void:
 	var shader_string := FileAccess.get_file_as_string(path)
+	shader_string = shader_string.format(_include_files)
+	
 	var shader_source := RDShaderSource.new()
 	shader_source.set_stage_source(RenderingDevice.SHADER_STAGE_COMPUTE, shader_string)
 	var spirv := rendering_device.shader_compile_spirv_from_source(shader_source)
