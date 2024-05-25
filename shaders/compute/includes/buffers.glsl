@@ -10,7 +10,6 @@ layout(set = 0, binding = 0, std430) restrict readonly buffer ParamsBuffer {
     int selected_element_id;
     float vertical_rand;
     float horizontal_rand;
-    int stage;
 } params;
 
 layout(set = 0, binding = 1, std430) restrict buffer ElementsBuffer {

@@ -8,7 +8,6 @@ extends Resource
 @export var selected_element_id: int
 @export var vertical_rand: float
 @export var horizontal_rand: float
-@export var stage: int
 
 
 func encode() -> PackedByteArray:
@@ -20,5 +19,4 @@ func encode() -> PackedByteArray:
 	Packing.encode_int(packed_array, selected_element_id)
 	Packing.encode_float(packed_array, vertical_rand)
 	Packing.encode_float(packed_array, horizontal_rand)
-	Packing.encode_int(packed_array, stage)
 	return packed_array
