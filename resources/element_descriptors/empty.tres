@@ -6,8 +6,9 @@
 script = ExtResource("1_83fix")
 id = 0
 name = "Empty"
-density = 0.0
+density = 50.0
 flamability = 0.0
+padding = 0.0
 color = Color(0, 0, 0, 0)
 vertical_code = "STAY_UPDATE"
 diagonal_code = "STAY_UPDATE"

@@ -2,6 +2,10 @@
  * Utility Functions *
  *********************/
 
+UpdateOutput test_update_vertical(Element element, uint x, uint y);
+UpdateOutput test_update_diagonal(Element element, uint x, uint y);
+UpdateOutput test_update_horizontal(Element element, uint x, uint y);
+
  Element get_element_from_descriptor(ElementDescriptor element_descriptor) {
     Element element;
     element.id = element_descriptor.id;
@@ -17,6 +21,32 @@ uint get_index_from_position(uint x, uint y) {
 
 bool is_cell_empty(uint x, uint y) {
     return elements.data[get_index_from_position(x, y)].id == 0;
+}
+
+int compare_density(Element element, uint x, uint y) {
+    Element other_element = elements.data[get_index_from_position(x, y)];
+    if (element.id == other_element.id) return 0;
+    if (element.density - other_element.density > 0) return 1;
+    return -1;
+
+}
+
+bool will_move_here(uint x0, uint y0, uint x1, uint y1, int stage) {
+    Element calling_element = elements.data[get_index_from_position(x0, y0)];
+    Element element = elements.data[get_index_from_position(x1, y1)];
+    if (calling_element.id == element.id) return false;
+    if (element.updated) return x0 == x1 && y0 == y1;
+
+    UpdateOutput update_output;
+    switch (stage) {
+        case 1: update_output = test_update_vertical(element, x1, y1); break;
+        case 2: update_output = test_update_diagonal(element, x1, y1); break;
+        case 3: update_output = test_update_horizontal(element, x1, y1); break;
+        default: return false;
+    }
+
+    if (!update_output.updated) return x0 == x1 && y0 == y1;;
+    return update_output.x == x0 && update_output.y == y0;
 }
 
 bool is_output_cell_empty(uint x, uint y) {
@@ -39,8 +69,7 @@ void sync_buffers(uint x, uint y) {
 }
 
 void clear_output_buffer(uint x, uint y) {
-    uint index = get_index_from_position(x, y);
-    output_elements.data[index].id = 0;
+    output_elements.data[get_index_from_position(x, y)] = get_element_from_descriptor(element_descriptors.data[0]);
 }
 
 void sync_threads() {

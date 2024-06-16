@@ -11,15 +11,17 @@
 #define LEFT     x - 1, y
 #define RIGHT    x + 1, y
 
-#define UP_LEFT   x - 1, y - 1
-#define UP_RIGHT  x + 1, y - 1
+#define UP_LEFT    x - 1, y - 1
+#define UP_RIGHT   x + 1, y - 1
 #define DOWN_LEFT  x - 1, y + 1
 #define DOWN_RIGHT x + 1, y + 1
 
+#define WILL_MOVE_HERE(xx, yy, s) will_move_here(POSITION, xx, yy, s)
+
 // Movement macros
 
-#define CAN_MOVE_UP    (y > 0 && is_cell_empty(UP))
-#define CAN_MOVE_DOWN  (y < params.height - 1 && is_cell_empty(DOWN))
+#define CAN_MOVE_UP    (y > 0 && compare_density(element, UP) < 0)
+#define CAN_MOVE_DOWN  (y < params.height - 1 && compare_density(element, DOWN) > 0)
 #define CAN_MOVE_LEFT  (params.horizontal_rand <= 0.5 && x > 0 && is_cell_empty(LEFT))
 #define CAN_MOVE_RIGHT (params.horizontal_rand >= 0.5 && x < params.width - 1 && is_cell_empty(RIGHT))
 
@@ -38,7 +40,7 @@
 #define MOVE_LEFT  return UpdateOutput(x - 1, y, true);
 #define MOVE_RIGHT return UpdateOutput(x + 1, y, true);
 
-#define MOVE_UP_LEFT   return UpdateOutput(x - 1, y - 1, true);
-#define MOVE_UP_RIGHT  return UpdateOutput(x + 1, y - 1, true);
+#define MOVE_UP_LEFT    return UpdateOutput(x - 1, y - 1, true);
+#define MOVE_UP_RIGHT   return UpdateOutput(x + 1, y - 1, true);
 #define MOVE_DOWN_LEFT  return UpdateOutput(x - 1, y + 1, true);
 #define MOVE_DOWN_RIGHT return UpdateOutput(x + 1, y + 1, true);

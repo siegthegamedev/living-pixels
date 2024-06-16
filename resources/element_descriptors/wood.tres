@@ -6,8 +6,9 @@
 script = ExtResource("1_05uk6")
 id = 3
 name = "Wood"
-density = 0.0
+density = 100.0
 flamability = 0.0
+padding = 0.0
 color = Color(0.545098, 0.270588, 0.0745098, 1)
 vertical_code = "STAY_UPDATE"
 diagonal_code = "STAY_UPDATE"

@@ -8,7 +8,7 @@
 [ext_resource type="Resource" uid="uid://co5h0tbd7kwvs" path="res://resources/element_descriptors/wood.tres" id="4_oenw0"]
 [ext_resource type="Resource" uid="uid://beukfuqi1oee4" path="res://resources/element_descriptors/gas.tres" id="5_g5myb"]
 [ext_resource type="Resource" uid="uid://3epdajh3oahi" path="res://resources/element_descriptors/stone.tres" id="7_mv78r"]
-[ext_resource type="Resource" uid="uid://c3q3r8llpbeor" path="res://resources/element_descriptors/reverse_sand.tres" id="8_trfbm"]
+[ext_resource type="Resource" uid="uid://b7yfvi4wwci21" path="res://resources/element_descriptors/inverse_sand.tres" id="8_dh4k0"]
 
 [sub_resource type="Resource" id="Resource_577jf"]
 script = ExtResource("2_cqhuj")
@@ -29,7 +29,7 @@ MarginContainer/constants/margin_top = 20
 
 [node name="Simulation" type="Node" node_paths=PackedStringArray("simulation_visualizer", "debug_labels")]
 script = ExtResource("1_c87s1")
-element_descriptors = Array[Resource("res://scripts/element_descriptor.gd")]([ExtResource("2_s26jv"), ExtResource("2_jss3v"), ExtResource("3_8mwiy"), ExtResource("4_oenw0"), ExtResource("5_g5myb"), ExtResource("7_mv78r"), ExtResource("8_trfbm")])
+element_descriptors = Array[Resource("res://scripts/element_descriptor.gd")]([ExtResource("2_s26jv"), ExtResource("2_jss3v"), ExtResource("3_8mwiy"), ExtResource("4_oenw0"), ExtResource("5_g5myb"), ExtResource("7_mv78r"), ExtResource("8_dh4k0")])
 simulation_visualizer = NodePath("SimulationVisualizer")
 params = SubResource("Resource_577jf")
 debug_labels = [NodePath("DebugMetrics/VBoxContainer/EmptyCount"), NodePath("DebugMetrics/VBoxContainer/SandCount"), NodePath("DebugMetrics/VBoxContainer/WaterCount"), NodePath("DebugMetrics/VBoxContainer/WoodCount"), NodePath("DebugMetrics/VBoxContainer/GasCount")]

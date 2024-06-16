@@ -6,11 +6,12 @@
 script = ExtResource("1_wq261")
 id = 5
 name = "Stone"
-density = 0.0
+density = 80.0
 flamability = 0.0
 padding = 0.0
 color = Color(0.411765, 0.411765, 0.411765, 1)
-vertical_code = "if CAN_MOVE_DOWN MOVE_DOWN 
+vertical_code = "if CAN_MOVE_DOWN MOVE_DOWN
+if CAN_MOVE_UP MOVE_UP
 STAY"
 diagonal_code = "STAY"
 horizontal_code = "STAY"

@@ -6,10 +6,12 @@
 script = ExtResource("1_ubo7n")
 id = 4
 name = "Gas"
-density = 0.0
+density = 40.0
 flamability = 0.0
+padding = 0.0
 color = Color(1, 0.894118, 0.882353, 1)
-vertical_code = "if CAN_MOVE_UP MOVE_UP
+vertical_code = "if CAN_MOVE_DOWN MOVE_DOWN
+if CAN_MOVE_UP MOVE_UP
 STAY"
 diagonal_code = "if CAN_MOVE_UP_RIGHT MOVE_UP_RIGHT
 if CAN_MOVE_UP_LEFT MOVE_UP_LEFT 

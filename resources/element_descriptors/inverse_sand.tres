@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ElementDescriptor" load_steps=2 format=3 uid="uid://b7yfvi4wwci21"]
+
+[ext_resource type="Script" path="res://scripts/element_descriptor.gd" id="1_g353k"]
+
+[resource]
+script = ExtResource("1_g353k")
+id = 6
+name = "Inverse Sand"
+density = 30.0
+flamability = 0.0
+padding = 0.0
+color = Color(0.274628, 0.536607, 0.522524, 1)
+vertical_code = "if CAN_MOVE_DOWN MOVE_DOWN
+if CAN_MOVE_UP MOVE_UP
+STAY"
+diagonal_code = "if CAN_MOVE_UP_RIGHT MOVE_UP_RIGHT
+if CAN_MOVE_UP_LEFT MOVE_UP_LEFT 
+STAY"
+horizontal_code = "STAY"
